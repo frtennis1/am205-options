@@ -12,15 +12,24 @@
 \usepackage{hyperref}
 
 \pagestyle{fancy}
-\lhead{Francisco Rivera}
+\lhead{Rivera and Chen}
 \rhead{Numerical Exploration of Local Volatility}
 
 
-\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
 \definecolor{lgray}{gray}{0.95}
 \definecolor{mygreen}{rgb}{0,0.6,0}
 \definecolor{mygray}{rgb}{0.5,0.5,0.5}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\hypersetup{
+    colorlinks = true,
+	linkcolor = RoyalBlue,
+    urlcolor = RoyalBlue
+}
+
+\numberwithin{equation}{section}
+
 \lstset{ %
   backgroundcolor=\color{lgray},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
   basicstyle=\ttfamily\footnotesize,        % the size of the fonts that are used for the code
@@ -93,42 +102,58 @@ The price at which the holder of the option can buy/sell is called the
 \emph{strike price}, denoted $K$. Invoking the right to buy/sell is called
 \emph{exercising} the option. The last time at which the holder can exercise is
 called the \emph{expiry}, denoted as time $T$. The value of the underlying asset
-at time $t$ is denoted as $S_t$. 
+at time $t$ is denoted as $S_t$ (and sometimes the subscript is dropped whenever
+it is implied). 
 
 The payoff of a call option at expiry is thus given by,
-\[ \max(S_T - K, 0) \]
+\begin{equation}
+ \max(S_T - K, 0) 
+\label{eqn:callpayoff}
+\end{equation}
 because the owner will only exercise it if the underlying is worth more than the
-strike price.
+strike price. This function gives rise the characteristic ``hockey-stick''
+payoff diagram of an option at expiry,
 
 \begin{center}
 \includegraphics{figs/calloptpayoff}
 \end{center}
 
-The payoff of a put option is simililarly,
-\[ \max(K-S_T, 0) \]
-and the payoff curve looks like,
+The payoff of a put option is very similar to equation \ref{eqn:callpayoff},
+\begin{equation}
+ \max(K-S_T, 0) 
+\end{equation}
+because the owner of the option will only exercise it if the underlying is worth
+less than the strike price, 
+and the payoff curve looks like its mirror image,
 
 \begin{center}
 \includegraphics{figs/putoptpayoff}
 \end{center}
 
 \subsection{Risk-Neutral Pricing}
+\label{subsec:riskneutral}
 
 The value of an option at expiry is easily observable and displayed in the
 figures in Section \ref{subsec:terminology}. However, before time $T$, the
 value of $S_T$ is a random variable. Asset pricing (change of measure) theorems
 allow us to write the value of a call option as the discounted expectation of
 the payoff under what we call the risk-neutral distribution,
-\[ C(T,K) = e^{-rT} \int_K^\infty (S - K)
-\underbrace{\phi(T,S)}_\text{risk-neutral PDF} \, dS.\]
+\begin{equation}
+ \frac{C(S_0, K, T)}{e^{-rT}} = \int_K^\infty (S - K)
+\underbrace{\phi(S, T; S_0)}_\text{risk-neutral PDF} \, dS
+\label{eqn:riskneutralpricing}
+\end{equation}
 However, in order to make any progress beyond this, we need to make a further
 assumption about what this risk-neutral distribution looks like.
 
 \subsection{Black-Scholes Model}
+\label{subsec:bs}
 The Black-Scholes model makes one such assumption by writing how the asset
 diffuses over time. In particular, the Black-Scholes model treates the asset
 price as a geometric Brownian motion such that,
-\[ \frac{dS}{S} = r dt + \sigma dW \]
+\begin{equation}
+ \frac{dS}{S} = r dt + \sigma dW 
+\end{equation}
 where $W$ is Brownian motion and $\sigma$ is a constant value called the implied
 volatility. 
 
@@ -160,10 +185,128 @@ price of AAPL will diffuse with higher volatility than if it is just up 5\%.
 Thus, the assumption of constant $\sigma$ is suspect.
 
 \section{Local Volatility Theory}
+\label{sec:localvoltheory}
+
+The local-volatility model directly combats this shortcoming of the
+Black-Scholes model by rewriting the diffusion equation as,
+\begin{equation}
+ \frac{dS}{S} = r dt + \sigma(S,t) dW 
+\end{equation}
+such that the volatility is no longer a global constant, but rather a function
+of spot-price and time. We refer to this function as the \emph{local volatility
+function}, and the value of the function at any given point as the \emph{local
+volatility}. Note of course that in the special case when $\sigma$ is a constant
+function, we have simply recovered the Black-Scholes model. We will make use of
+this fact when we need to confirm the numerical results of the local volatility
+model against theoretical closed-forms.
+
+In the general case, though, we care about what the local volatility surface
+says about prices and vice-versa. To this end, we can invoke Dupire's\footnote{
+TODO: citation needed} work. The first thing to note is that we can
+differentiate our risk-neutral pricing formula with respect to $K$ twice to get
+that,
+\begin{equation}
+ e^{-rT} \phi(K, T; S_0) = \frac{\partial^2 C}{\partial K^2}.
+\end{equation}
+Moreover, because we have a diffusion rule for the underlying $S_t$, the
+probability distributions must satisfy the Fokker-Planck equation. (We
+display this without drift. In practice, we can do this for the underlying
+itself if is driftless, but if we are worried about drift, we can simply use the
+forward price which is by construction a martingale),
+\begin{equation}
+ \frac{\partial C}{\partial T} = \frac{1}{2} e^{rT} \sigma^2 K^2 \frac{\partial^2
+C}{\partial K^2}
+\end{equation}
+Rearranging gives us Dupire's equation,
+\begin{equation}
+ \sigma^2(K, T, S_0) = \frac{ \frac{\partial C}{\partial T} e^{-rT}}
+{\frac{1}{2} K^2 \frac{\partial^2 C}{\partial K^2}}.
+\end{equation}
+We can also rewrite this assuming 0 interest rates, which we will assume going
+forward for simplicity,
+\begin{equation}
+ \sigma^2(K, T, S_0) = \frac{ \frac{\partial C}{\partial T}}
+{\frac{1}{2} K^2 \frac{\partial^2 C}{\partial K^2}}.
+\end{equation}
+
+There are a couple notable takeaways from this equation. First of all, if we
+fully and perfectly observed a continuum of option prices for all strikes and
+expiries, we would be able to uniquely determine the local volatility surface.
+Moreover, we can do this \emph{regardless} of what the option prices
+are\footnote{We get negative local volatility if arbitrage conditions are violated,
+but we assume this does not happen.}. This means that unlike Black-Scholes, the
+local volatility model can perfectly fit what we see, and we should be
+apprehensive of overfitting.
+
 
 \section{Pricing with Local Volatility}
+\label{sec:localvolpricing}
+
+In this section, we will concern ourselves with what we can do once we have the
+local volatility surface. In particular, our main objective will be to 
+price options. Note that the prices may exist in the market (e.g.\ as a sanity
+check for our model), or they may not (e.g.\ to price options with expiries that
+are not quoted, giving our model predictive power).
+
+\subsection{Monte-Carlo Methods}
+\label{subsec:montecarlopricing}
+
+One way to do this is by realizing that the price is an expectation under the
+risk-neutral distribution of the pay-off random variable (as in Equation
+\ref{eqn:riskneutralpricing}). Thus, if we can sample
+from this distribution, we can invoke the law of large numbers and get an
+estimate for its average with sufficient samples. To this end, first we build a
+function that allows us to sample from the risk-neutral distribution of ending
+spot prices in Listing \ref{lst:sampleendprice}.
+
+In this implementation, we have two types of numerical error to reason about.
+The first is simply sampling error. Because we are only taking a finitely many
+number of draws from the distribution, our sample mean will differ from the true
+mean by a quantity that decreases with $\sqrt{n}$. Harder to reason about is the
+discretization error that we introduce. 
+
+\begin{lstlisting}[float=*,
+    caption=Sampling from Risk-Neutral $S_T$ Distribution,
+    label=lst:sampleendprice]
+def sample_end_price(S0, local_vol_f, duration, n_intervals, n_samples):
+    """
+    Inputs
+    ------
+    S0 : float
+        The initial spot price of the asset at time t=0
+        
+    local_vol_f : float -> float (vectorized)
+        The local volatility at a given spot price (assumed constant over time)
+        
+    duration : float
+        The time to expiry, i.e. T.
+    
+    n_intervals : float
+        Number of intervals into which to break up the numerical simulation
+    
+    n_samples : int
+        Number of simulations to run
+        
+    Output
+    -----
+    S : NumPy float vector of length n_samples
+        The ending spot prices of the asset diffusion for each simulation
+    """
+    scaling_factor = duration / np.sqrt(n_intervals)
+    S = np.zeros((n_samples, n_intervals+1))
+    S[:,0] = S0
+    for i in range(1,n_intervals+1):
+        local_vols = local_vol_f(S[:,i-1])
+        growth_factor = np.exp(local_vols * np.random.randn(n_samples) * scaling_factor)
+        S[:,i] = S[:,i-1] * growth_factor
+    return S[:,-1]
+\end{lstlisting}
+
+\subsection{Tree-Based Methods}
+\label{subsec:treepricing}
 
 \section{Fitting Local Volatility}
+\label{sec:localvolfitting}
 
 \section{Conclusions}
 
