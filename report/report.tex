@@ -265,6 +265,12 @@ number of draws from the distribution, our sample mean will differ from the true
 mean by a quantity that decreases with $\sqrt{n}$. Harder to reason about is the
 discretization error that we introduce. 
 
+% TODO: what is the discretization error of this? Can we assess it theoretically
+% (if not, we can surely reason about it empirically by seeing how different
+%  values we get for different number of discretization intervals are, though
+%  this may prove tricky if the sampling error requires us to run an
+%  unreasonable number of samples for each number of intervals)
+
 \begin{lstlisting}[float=*,
     caption=Sampling from Risk-Neutral $S_T$ Distribution,
     label=lst:sampleendprice]
