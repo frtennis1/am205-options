@@ -1,4 +1,4 @@
-\documentclass[twocolumn]{article}
+\documentclass[12pt]{article}
 
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath}
@@ -7,6 +7,7 @@
 \usepackage{wrapfig}
 \usepackage{epsfig}
 \usepackage{float}
+\usepackage{palatino,mathpazo,inconsolata}
 \usepackage{graphicx}
 \usepackage{fancyhdr}
 \usepackage{hyperref}
@@ -33,7 +34,7 @@
 \lstset{ %
   backgroundcolor=\color{lgray},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
   basicstyle=\ttfamily\footnotesize,        % the size of the fonts that are used for the code
-  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breakatwhitespace=true,         % sets if automatic breaks should only happen at whitespace
   breaklines=true,                 % sets automatic line breaking
   commentstyle=\color{mygreen},    % comment style
   deletekeywords={...},            % if you want to delete keywords from the given language
@@ -53,7 +54,10 @@
   stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
   stringstyle=\color{mymauve},     % string literal style
   tabsize=2,	                   % sets default tabsize to 2 spaces
+  columns=fullflexible
 }
+
+
 
 \begin{document}
 
@@ -81,8 +85,6 @@ price out-of-sample options.
 \end{abstract}
 
 \tableofcontents
-
-\twocolumn
 
 \newpage
 
