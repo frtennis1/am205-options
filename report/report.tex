@@ -1,5 +1,5 @@
 \documentclass[12pt]{article}
-
+\linespread{1.1}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath}
 \usepackage{booktabs}
@@ -95,13 +95,13 @@ price out-of-sample options.
 \label{subsec:terminology}
 
 Before delving into the theoretical and numerical results, we briefly summarize
-options terminology. An option is a derivative on some asset, henceforth called
+options terminology. An option is a \emph{derivative} on some asset, henceforth called
 the \emph{underlying}---i.e.\ it's value is \emph{derived} from the value of the
-underlying. The owner of a call/put option has the right but not the obligation
-to buy/sell the underlying asset at a given price at some date in the future.
+underlying. The owner of a call (resp. put) option has the right but not the obligation
+to buy (resp. sell) the underlying asset at a given price at some date in the future.
 
 The price at which the holder of the option can buy/sell is called the
-\emph{strike price}, denoted $K$. Invoking the right to buy/sell is called
+\emph{strike price}, denoted $K$. Invoking the right to buy or sell is called
 \emph{exercising} the option. The last time at which the holder can exercise is
 called the \emph{expiry}, denoted as time $T$. The value of the underlying asset
 at time $t$ is denoted as $S_t$ (and sometimes the subscript is dropped whenever
@@ -137,9 +137,11 @@ and the payoff curve looks like its mirror image,
 
 The value of an option at expiry is easily observable and displayed in the
 figures in Section \ref{subsec:terminology}. However, before time $T$, the
-value of $S_T$ is a random variable. Asset pricing (change of measure) theorems
+value of $S_T$ is a random variable. Asset pricing (change of measure) 
+%TODO add citation
+theorems
 allow us to write the value of a call option as the discounted expectation of
-the payoff under what we call the risk-neutral distribution,
+the payoff under what we call the \emph{risk-neutral distribution},
 \begin{equation}
  \frac{C(S_0, K, T)}{e^{-rT}} = \int_K^\infty (S - K)
 \underbrace{\phi(S, T; S_0)}_\text{risk-neutral PDF} \, dS
@@ -152,12 +154,12 @@ assumption about what this risk-neutral distribution looks like.
 \label{subsec:bs}
 The Black-Scholes model makes one such assumption by writing how the asset
 diffuses over time. In particular, the Black-Scholes model treates the asset
-price as a geometric Brownian motion such that,
+price as a geometric Brownian motion represented by the following stochastic difference equation:
 \begin{equation}
  \frac{dS}{S} = r dt + \sigma dW 
 \end{equation}
-where $W$ is Brownian motion and $\sigma$ is a constant value called the implied
-volatility. 
+where $W$ is Brownian motion and $\sigma$ is a constant value called the \emph{implied
+volatility}. 
 
 This forces the risk-neutral distribution to be log-normal and makes
 finding the price analytically tractable. In particular, since the only pricing
@@ -177,7 +179,7 @@ November 20$^\text{th}$, 2017 from Yahoo Finance, we get the following curve
 \includegraphics{figs/aapliv}
 \end{center}
 
-While the data is noisy, particularly for deep-in-the money puts
+While the data is noisy, particularly for deep-in-the money\footnote{An option is said to be \emph{in-the-money} when its payoff is positive if $S_T = S_0$, \emph{out-of-the-money} when its payoff is negative if $S_T = S_0$, and \emph{at-the-money} otherwise.} puts
 which are hardly ever traded, the graph is unmistakably not constant. Moreover,
 AAPL is not an exception: most graphs of implied volatility versus strike have a
 similar shape. These deviations from Black-Scholes also correspond to
@@ -189,7 +191,7 @@ Thus, the assumption of constant $\sigma$ is suspect.
 \section{Local Volatility Theory}
 \label{sec:localvoltheory}
 
-The local-volatility model directly combats this shortcoming of the
+The \emph{local-volatility model} directly responds this shortcoming of the
 Black-Scholes model by rewriting the diffusion equation as,
 \begin{equation}
  \frac{dS}{S} = r dt + \sigma(S,t) dW 
@@ -211,7 +213,11 @@ that,
  e^{-rT} \phi(K, T; S_0) = \frac{\partial^2 C}{\partial K^2}.
 \end{equation}
 Moreover, because we have a diffusion rule for the underlying $S_t$, the
-probability distributions must satisfy the Fokker-Planck equation. (We
+probability distributions must satisfy 
+the \emph{Fokker-Planck equation}. 
+%TODO: move the parenthetical to a footnote
+%TODO: Add citation
+(We
 display this without drift. In practice, we can do this for the underlying
 itself if is driftless, but if we are worried about drift, we can simply use the
 forward price which is by construction a martingale),
