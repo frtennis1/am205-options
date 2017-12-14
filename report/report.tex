@@ -25,8 +25,9 @@
 
 \hypersetup{
     colorlinks = true,
-	linkcolor = RoyalBlue,
-    urlcolor = RoyalBlue
+	  linkcolor = RoyalBlue,
+    urlcolor = blue,
+    citecolor = Blue
 }
 
 \numberwithin{equation}{section}
@@ -58,6 +59,13 @@
 }
 
 
+
+\newcommand{\diff}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\Norm}{\mathcal N}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\norm}[1]{||#1||}
+\newcommand{\pr}[1]{\left(#1\right)}
+\usepackage{natbib}
 
 \begin{document}
 
@@ -322,8 +330,75 @@ def sample_end_price(S0, local_vol_f, duration, n_intervals, n_samples):
 \section{Fitting Local Volatility}
 \label{sec:localvolfitting}
 
+
+\section{Theoretical analysis of numerical methods}
+\label{sec:theory}
+Our approach involves two separate applications of numerical techniques. First, we observe existing option prices $C(K,T)$ and compute the local volatility function via Dupire's equation \[
+\sigma^2 = \frac{\diff{C}{T}}{\frac{1}{2}K^2\diff{^2C}{K^2}}.
+\] 
+Second, given an estimate of the local volatility $\sigma^2$, we numerically predict option prices. In this section, we discuss some theoretical difficulties in deriving analytical bounds on our approximations. In particular, we proceed in reverse order. We first discuss the numerical errors of Monte Carlo pricing, assuming the local volatility $\sigma^2$ is known.
+
+\subsection{Discretization errors in Monte Carlo pricing}
+In Monte Carlo pricing, we draw from the distribution of $S_T$ and compute option prices. We start with the stochastic difference equation\footnote{We assume interest rates are zero, and so there is no drift term for simplicity} \[
+dS_t = S_t \sigma(S_t,t) \, dW_t,
+\]
+and approximate with finite differences 
+\begin{equation}
+    \label{eq:euler-maruyama}
+    \tilde S_{t_{k+1}} - \tilde S_{t_k} = \tilde S_{t_k} \sigma(\tilde S_{t_k}, t_k)\, (W_{t_{k+1}} - W_{t_k}) = \tilde S_{t_k} \sigma(\tilde S_{t_k}, t_k) \sqrt{t_{k+1}-t_k} Z_k,
+\end{equation}
+for some $Z_k = \frac{W_{t_{k+1}} - W_{t_k}}{\sqrt{t_{k+1}-t_k}} \sim \Norm(0,1)$. This is the well-known \emph{Euler-Maruyama method}, an extension of the forward Euler method in stochastic calculus. It has been shown that the recursively-computed sequence $\tilde S_{t_1},\ldots, \tilde S_{t_N}$ converges to a draw from the true stochastic process $S_t$ as the mesh of the partition $\{t_1,\ldots,t_N\}$ tends to zero \citep{dobrow2016introduction}.  
+
+Moreover, we can bound the rate of convergence. Let $\Delta t = t_{k+1} - t_k$ and suppose that $S_{t_k}$ is a draw from the true distribution. Let $S_{t_{k+1}}$ be drawn from the true distribution conditional on $S_{t_k}$, and let $\tilde S_{t_{k+1}}$ be the corresponding finite difference approximation via \eqref{eq:euler-maruyama} with respect to the same draw from the Brownian motion $W_t$. We have the following bounds on convergence \citep{higham2001algorithmic}: \begin{align}
+E\abs{S_{t_{k+1}} - \tilde S_{t_{k+1}}} &\le C_1(\Delta t)^{1/2} \tag{Strong convergence} \\
+\abs{E(g(\tilde S_{t_{k+1}})) - E (g(S_{t_{k+1}}))} &\le C_2 \Delta t \tag{Weak convergence}
+\end{align}
+for a $g$ that satisfies certain regularity conditions. 
+Applying an equally-spaced partition to $[0,T]$ with step-size $\Delta t$, we immediately observe that the draws from the distribution at expiry must obey the same bounds of convergence: \begin{align*}
+E\abs{S_{T} - \tilde S_{T}} &= O\pr{(\Delta t)^{1/2}} \\
+\abs{E(g(\tilde S_{{T}})) - E (g(S_{T}))} &= O(\Delta t).
+\end{align*}
+Since we apply Euler-Murayama method to option pricing, we are more interested in the error $\abs{E(g(\tilde S_T)) - E(g(S_T))},$ where $g$ is a function of the form $g(S_T) = \max(S_T - K, 0)$ (for call options). The nondifferentiability of $g$ may pose some concern, as \cite{higham2001algorithmic} notes that the weak convergence bound works for $g$ smooth. However, since there exists a sequence of smooth functions $\tilde g$ that uniformly converges to $g(S_T) = \max(S_T - K, 0)$, we have \[
+\abs{E(g(\tilde S_T)) - E(g(S_T))} \le 2\norm{g-\tilde g}_\infty + \abs{E(\tilde g(\tilde S_{{T}})) - E (\tilde g(S_{T}))},
+\]
+where $\norm{g-\tilde g}_\infty$ can be arbitrarily small. 
+
+\paragraph{Numerical experiment of first-order convergence of discretization error} Let $S_0 = 1, K = 1.1$, and \[\sigma(S, t) = \min\pr{0.1 + (S - 1)^2, 0.5}.\] Consider a call option at expiry $T = 1$ with strike $K$, whose payoff is $\max(S_T, K) - K$. Assume zero interest rate. We approximate the expectation with sample mean with sample size $10^6$. We approximate the true value of the option by computing the Euler-Murayama approximation with step-size equalling $1/200$. We then plot the pricing errors of Euler-Murayama approximations with step size $1/n$ for $n=1,\ldots,40$ in Figure~\ref{fig:log-log}. 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figs/montecarlo_discrete.png}
+    \caption{Log-log plot of pricing error against $\Delta t$}
+    \label{fig:log-log}
+\end{figure}
+It is difficult to control the Monte Carlo sampling error, due to computational resource constraints, but we do observe approximately a first-order convergence pattern. 
+
+
+Thus, for a known $\sigma^2$, we can limit the size of the discretization error at rate $O(\Delta t)$, and the size of the sampling error at rate $O(n^{-1/2})$ where $n$ is the sample size. The theory and the numerical experimentation suggests that the Monte Carlo pricing method is numerically robust. 
+\subsection{Approximation of Dupire's equation}
+However, computing $\sigma^2$ from observed data accurately is a much more difficult task. We illustrate the main difficulty below.
+
+Let $A = \diff{C}{T} + e_1$ and $B = \diff{^2C}{K^2} + e_2$ be two approximations. Then \[
+\frac{A}{\frac{1}{2}K^2 B} = \sigma^2 \frac{\diff{^2C}{K^2}}{\diff{^2C}{K^2} + e_2} + \frac{e_1}{\frac{1}{2}K^2 B}.
+\]
+Thus the absolute error \[
+\abs{\frac{A}{\frac{1}{2}K^2 B} - \sigma^2} \le \sigma^2 \abs{\frac{e_2}{\diff{^2C}{K^2}+e_2}} + \abs{\frac{e_1}{\frac{1}{2}K^2B}}.
+\]
+Since $\diff{^2C}{K^2} > 0$, it should be unsurprising that the error vanishes as $e_1,e_2 \to 0$. However, note that deep-in-the-money options are virtually indistinguishable from the underlying asset, whereas deep-out-of-the-money options are virtually worthless. Thus $C$ is almost linear as a function of $K$ when $K$ is away from $S_0$.
+%TODO: figure
+Even though $\diff{^2C}{K^2} > 0$, the infimum of this second derivative is zero. This presents a first difficulty when attempting to bound the error of the approximations. A second challenge arises from the discreteness of empirical prices. We cannot evaluate the function $C(K,T)$ anywhere we wish, but rather we only observe its values on a grid whose fineness is capped at the finest intervals that prices are quoted in. To make matters worse, the prices quoted are accurate to $\$0.01$, and so it is as if we are working in a world where machine precision is nontrivially large.
+
+
+The usual centered difference approximations have \[
+|e_1|\le \frac{h_1^2}{6}\sup \abs{\diff{^3C}{T^3}} + \frac{\epsilon}{2h_1} \qquad |e_2| \le \frac{h_2^2}{12}\sup \abs{\diff{^4C}{K^4}} + \frac{2\epsilon}{h_2^2}.
+\]
+For values of $\diff{^2C}{K^2}$ sufficiently large, it is plausible that these approximations are sufficiently accurate. However, the approximation is certainly not accurate for values of $\diff{^2C}{K^2}$ close to zero. Yet for these values, which correspond to deep-money options, the option price is virtually known---the large errors in $\sigma^2$ for $K$ far away from $S_0$ is weighted by the extremely small probability that such errors matter. Such weighting is analytically intractable, and we mainly focus on numerical experimentation. 
+
+
 \section{Conclusions}
 
 
+
+\bibliographystyle{chicago}
 \bibliography{am205.bib}
+
 \end{document}
