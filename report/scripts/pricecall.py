@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+
 def price_call(K, end_samples):
     """
     Price a call option using Monte Carlo samples.
@@ -23,3 +26,11 @@ def price_call(K, end_samples):
     px = payoffs.mean(axis=0)
     sd = payoffs.std(axis=0) / np.sqrt(len(end_samples))
     return px, sd
+
+def price_calls(Ks, samples):
+    payoffs = np.clip(np.subtract.outer(samples, Ks), 0, np.inf)
+    px = payoffs.mean(axis=0)
+    df = pd.DataFrame(px, index=samples.columns, columns=Ks)
+    df.index.name = 'Expiry'
+    df.columns.name = 'Strikes'
+    return df
