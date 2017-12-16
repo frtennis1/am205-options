@@ -14,7 +14,7 @@ class InterpolatedLocalVol:
             self.dates = np.array(dates)
             
         self.strikes = np.array(strikes)
-        self.f = interp.interp2d(self.strikes, self.dates, point_estimates, bounds_error=False)
+        self.f = interp.interp2d(self.strikes, self.dates, point_estimates, bounds_error=False, kind='linear')
     
     def __call__(self, raw_dates, strikes):
         if self.uses_dates:
