@@ -34,29 +34,29 @@
 
 \numberwithin{equation}{section}
 
-\lstset{ %
-  backgroundcolor=\color{lgray},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
-  basicstyle=\ttfamily\scriptsize,        % the size of the fonts that are used for the code
-  breakatwhitespace=true,         % sets if automatic breaks should only happen at whitespace
-  breaklines=true,                 % sets automatic line breaking
-  commentstyle=\color{mygreen},    % comment style
-  deletekeywords={...},            % if you want to delete keywords from the given language
-  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
-  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
-  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
-  keywordstyle=\color{blue},       % keyword style
-  language=Python,                 % the language of the code
-  morekeywords={*,...},            % if you want to add more keywords to the set
-  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
-  numbersep=5pt,                   % how far the line-numbers are from the code
-  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
-  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
-  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
-  showstringspaces=false,          % underline spaces within strings only
-  showtabs=false,                  % show tabs within strings adding particular underscores
-  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
-  stringstyle=\color{mymauve},     % string literal style
-  tabsize=2,	                   % sets default tabsize to 2 spaces
+\lstset{
+  backgroundcolor=\color{lgray},  
+  basicstyle=\ttfamily\scriptsize,       
+  breakatwhitespace=true,        
+  breaklines=true,                
+  commentstyle=\color{mygreen},   
+  deletekeywords={...},           
+  escapeinside={\%*}{*)},         
+  extendedchars=true,             
+  keepspaces=true,                
+  keywordstyle=\color{blue},      
+  language=Python,                
+  morekeywords={*,...},           
+  numbers=left,                   
+  numbersep=5pt,                  
+  numberstyle=\tiny\color{mygray},
+  rulecolor=\color{black},        
+  showspaces=false,               
+  showstringspaces=false,         
+  showtabs=false,                 
+  stepnumber=1,                   
+  stringstyle=\color{mymauve},    
+  tabsize=2,	                  
   columns=fullflexible
 }
 
@@ -184,21 +184,24 @@ Thus, Black-Scholes predicts that if $\sigma$ is indeed a constant, then for any
 option written on the same underlying (regardless of strike price or expiry),
 that the implied volatility will be (approximately) constant. However, this is
 directly counterfactual to the options prices that we observe. For example,
-looking at the prices of AAPL options that expire on January 2018 retrieved on
-November 20$^\text{th}$, 2017 from Yahoo Finance, we get the following curve
+looking at the prices of AAPL options that expire on April 2018 retrieved on
+December 17$^\text{th}$, 2017 from Yahoo Finance, we get the following curve
 
 \begin{center}
 \includegraphics{figs/aapliv}
 \end{center}
 
-While the data is noisy, particularly for deep-in-the money\footnote{An option is said to be \emph{in-the-money} when its payoff is positive if $S_T = S_0$, \emph{out-of-the-money} when its payoff is negative if $S_T = S_0$, and \emph{at-the-money} otherwise.} puts
-which are hardly ever traded, the graph is unmistakably not constant. Moreover,
-AAPL is not an exception: most graphs of implied volatility versus strike have a
-similar shape. These deviations from Black-Scholes also correspond to
-intuitive qualitative ideas. If the price of AAPL has just plunged 50\%, it is
-palatable to think there is a lot of investor uncertainty, and that the future
-price of AAPL will diffuse with higher volatility than if it is just up 5\%.
-Thus, the assumption of constant $\sigma$ is suspect.
+While the data is noisy, particularly for deep-in-the money\footnote{A call
+(resp. put) option is said to be \emph{in-the-money} when $S_0 > K$ (resp. $S_0
+< K$), \emph{out-of-the-money} when $S_0 < K$ (resp. $S_0 > K$), and at the
+money if $S_0 = K$.} puts which are hardly ever traded, the graph is
+unmistakably not constant. Moreover, AAPL is not an exception: most graphs of
+implied volatility versus strike have a similar shape. These deviations from
+Black-Scholes also correspond to intuitive qualitative ideas. If the price of
+AAPL has just plunged 50\%, it is palatable to think there is a lot of investor
+uncertainty, and that the future price of AAPL will diffuse with higher
+volatility than if it is just up 5\%.  Thus, the assumption of constant $\sigma$
+is suspect.
 
 \section{Local Volatility Theory}
 \label{sec:localvoltheory}
@@ -364,42 +367,16 @@ For values of $\diff{^2C}{K^2}$ sufficiently large, it is plausible that these a
 
 \section{Code}
 
-\begin{lstlisting}[
-    caption=Sampling from Risk-Neutral $S_T$ Distribution,
-    label=lst:sampleendprice]
-def sample_end_price(S0, local_vol_f, duration, n_intervals, n_samples):
-    """
-    Inputs
-    ------
-    S0 : float
-        The initial spot price of the asset at time t=0
-        
-    local_vol_f : float -> float (vectorized)
-        The local volatility at a given spot price (assumed constant over time)
-        
-    duration : float
-        The time to expiry, i.e. T.
-    
-    n_intervals : float
-        Number of intervals into which to break up the numerical simulation
-    
-    n_samples : int
-        Number of simulations to run
-        
-    Output
-    -----
-    S : NumPy float vector of length n_samples
-        The ending spot prices of the asset diffusion for each simulation
-    """
-    scaling_factor = duration / np.sqrt(n_intervals)
-    S = np.zeros((n_samples, n_intervals+1))
-    S[:,0] = S0
-    for i in range(1,n_intervals+1):
-        local_vols = local_vol_f(S[:,i-1])
-        growth_factor = np.exp(local_vols * np.random.randn(n_samples) * scaling_factor)
-        S[:,i] = S[:,i-1] * growth_factor
-    return S[:,-1]
-\end{lstlisting}
+\lstinputlisting[
+    caption=Sampling from risk-neutral $S_T$ distribution,
+    label=lst:sampleendprice]{scripts/sampleendprice.py}
 
+\lstinputlisting[
+    caption=Pricing call option from Monte-Carlo samples,
+    label=lst:pricecall]{scripts/pricecall.py}
+
+\lstinputlisting[
+    caption=Price using Black-Scholes formula,
+    label=lst:blackscholesprice]{scripts/blackscholesprice.py}
 
 \end{document}
