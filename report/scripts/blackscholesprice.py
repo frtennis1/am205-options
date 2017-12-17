@@ -1,3 +1,6 @@
+import numpy as np
+from scipy.stats import norm
+
 def black_scholes_price(S, vol, T, K):
     """
     A Black Scholes pricer for European call options which assumes 
