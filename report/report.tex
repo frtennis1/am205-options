@@ -74,7 +74,9 @@
 \onecolumn
 
 \title{A Numerical Exploration of the Local Volatility Model for Option Pricing}
-\author{Francisco Rivera \and Kevin Chen}
+\author{Francisco Rivera\thanks{Harvard College, 
+\href{mailto:frivera@college.harvard.edu}{frivera@college.harvard.edu} 
+} \and Jiafeng Chen\thanks{Harvard College, \href{mailto:jiafengchen@college.harvard.edu}{jiafengchen@college.harvard.edu}}}
 \date{\today}
 
 \maketitle
@@ -290,7 +292,7 @@ discretization error that we introduce.
 %  unreasonable number of samples for each number of intervals)
 
 
-\subsection{Discretization errors in Monte Carlo pricing}
+\subsection{Discretization Error}
 In Monte Carlo pricing, we draw from the distribution of $S_T$ and compute option prices. We start with the stochastic difference equation\footnote{We assume interest rates are zero, and so there is no drift term for simplicity} \[
 dS_t = S_t \sigma(S_t,t) \, dW_t,
 \]
@@ -314,30 +316,22 @@ Since we apply Euler-Murayama method to option pricing, we are more interested i
 \abs{E(g(\tilde S_T)) - E(g(S_T))} \le 2\norm{g-\tilde g}_\infty + \abs{E(\tilde g(\tilde S_{{T}})) - E (\tilde g(S_{T}))},
 \]
 where $\norm{g-\tilde g}_\infty$ can be arbitrarily small. 
+
+
 \section{Fitting Local Volatility}
 \label{sec:localvolfitting}
 
 
-\section{Theoretical analysis of numerical methods}
-\label{sec:theory}
-Our approach involves two separate applications of numerical techniques. First, we observe existing option prices $C(K,T)$ and compute the local volatility function via Dupire's equation \[
-\sigma^2 = \frac{\diff{C}{T}}{\frac{1}{2}K^2\diff{^2C}{K^2}}.
-\] 
-Second, given an estimate of the local volatility $\sigma^2$, we numerically predict option prices. In this section, we discuss some theoretical difficulties in deriving analytical bounds on our approximations. In particular, we proceed in reverse order. We first discuss the numerical errors of Monte Carlo pricing, assuming the local volatility $\sigma^2$ is known.
+
+% \section{Theoretical analysis of numerical methods}
+% \label{sec:theory}
+% Our approach involves two separate applications of numerical techniques. First, we observe existing option prices $C(K,T)$ and compute the local volatility function via Dupire's equation \[
+% \sigma^2 = \frac{\diff{C}{T}}{\frac{1}{2}K^2\diff{^2C}{K^2}}.
+% \] 
+% Second, given an estimate of the local volatility $\sigma^2$, we numerically predict option prices. In this section, we discuss some theoretical difficulties in deriving analytical bounds on our approximations. In particular, we proceed in reverse order. We first discuss the numerical errors of Monte Carlo pricing, assuming the local volatility $\sigma^2$ is known.
 
 
-\paragraph{Numerical experiment of first-order convergence of discretization error} Let $S_0 = 1, K = 1.1$, and \[\sigma(S, t) = \min\pr{0.1 + (S - 1)^2, 0.5}.\] Consider a call option at expiry $T = 1$ with strike $K$, whose payoff is $\max(S_T, K) - K$. Assume zero interest rate. We approximate the expectation with sample mean with sample size $10^6$. We approximate the true value of the option by computing the Euler-Murayama approximation with step-size equalling $1/200$. We then plot the pricing errors of Euler-Murayama approximations with step size $1/n$ for $n=1,\ldots,40$ in Figure~\ref{fig:log-log}. 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.5\textwidth]{figs/montecarlo_discrete.png}
-    \caption{Log-log plot of pricing error against $\Delta t$}
-    \label{fig:log-log}
-\end{figure}
-It is difficult to control the Monte Carlo sampling error, due to computational resource constraints, but we do observe approximately a first-order convergence pattern. 
-
-
-Thus, for a known $\sigma^2$, we can limit the size of the discretization error at rate $O(\Delta t)$, and the size of the sampling error at rate $O(n^{-1/2})$ where $n$ is the sample size. The theory and the numerical experimentation suggests that the Monte Carlo pricing method is numerically robust. 
-\subsection{Approximation of Dupire's equation}
+\subsection{Theoretical Analysis}
 However, computing $\sigma^2$ from observed data accurately is a much more difficult task. We illustrate the main difficulty below.
 
 Let $A = \diff{C}{T} + e_1$ and $B = \diff{^2C}{K^2} + e_2$ be two approximations. Then \[
@@ -355,6 +349,7 @@ The usual centered difference approximations have \[
 |e_1|\le \frac{h_1^2}{6}\sup \abs{\diff{^3C}{T^3}} + \frac{\epsilon}{2h_1} \qquad |e_2| \le \frac{h_2^2}{12}\sup \abs{\diff{^4C}{K^4}} + \frac{2\epsilon}{h_2^2}.
 \]
 For values of $\diff{^2C}{K^2}$ sufficiently large, it is plausible that these approximations are sufficiently accurate. However, the approximation is certainly not accurate for values of $\diff{^2C}{K^2}$ close to zero. Yet for these values, which correspond to deep-money options, the option price is virtually known---the large errors in $\sigma^2$ for $K$ far away from $S_0$ is weighted by the extremely small probability that such errors matter. Such weighting is analytically intractable, and we mainly focus on numerical experimentation. 
+
 
 
 \section{Conclusions}
