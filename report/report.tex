@@ -28,7 +28,7 @@
 \hypersetup{
     colorlinks = true,
 	  linkcolor = RoyalBlue,
-    urlcolor = blue,
+    urlcolor = RoyalBlue,
     citecolor = Blue
 }
 
@@ -150,8 +150,7 @@ and the payoff curve looks like its mirror image,
 The value of an option at expiry is easily observable and displayed in the
 figures in Section \ref{subsec:terminology}. However, before time $T$, the
 value of $S_T$ is a random variable. Asset pricing (change of measure) 
-%TODO add citation
-theorems
+theorems \citep{cochrane2009asset}
 allow us to write the value of a call option as the discounted expectation of
 the payoff under what we call the \emph{risk-neutral distribution},
 \begin{equation}
@@ -220,8 +219,7 @@ this fact when we need to confirm the numerical results of the local volatility
 model against theoretical closed-forms.
 
 In the general case, though, we care about what the local volatility surface
-says about prices and vice-versa. To this end, we can invoke Dupire's\footnote{
-TODO: citation needed} work. The first thing to note is that we can
+says about prices and vice-versa. To this end, we can invoke \cite{dupire1997pricing}. The first thing to note is that we can
 differentiate our risk-neutral pricing formula with respect to $K$ twice to get
 that,
 \begin{equation}
@@ -229,13 +227,10 @@ that,
 \end{equation}
 Moreover, because we have a diffusion rule for the underlying $S_t$, the
 probability distributions must satisfy 
-the \emph{Fokker-Planck equation}. 
-%TODO: move the parenthetical to a footnote
-%TODO: Add citation
-(We
+the \emph{Fokker-Planck equation} \citep{risken1996fokker},\footnote{We
 display this without drift. In practice, we can do this for the underlying
 itself if is driftless, but if we are worried about drift, we can simply use the
-forward price which is by construction a martingale),
+forward price which is by construction a martingale}
 \begin{equation}
  \frac{\partial C}{\partial T} = \frac{1}{2} e^{rT} \sigma^2 K^2 \frac{\partial^2
 C}{\partial K^2}
@@ -287,12 +282,6 @@ The first is simply sampling error. Because we are only taking a finitely many
 number of draws from the distribution, our sample mean will differ from the true
 mean by a quantity that decreases with $\sqrt{n}$. Harder to reason about is the
 discretization error that we introduce. 
-
-% TODO: what is the discretization error of this? Can we assess it theoretically
-% (if not, we can surely reason about it empirically by seeing how different
-%  values we get for different number of discretization intervals are, though
-%  this may prove tricky if the sampling error requires us to run an
-%  unreasonable number of samples for each number of intervals)
 
 
 \subsection{Discretization Error}
