@@ -50,7 +50,7 @@ def sample_end_prices(S0, local_vol_f, durations, intervals_per_year, n_samples)
     S = np.zeros((n_samples, len(durations)))
     Dt = np.hstack([durations[0], np.diff(durations)])
     S_initial = S0
-    for i, T in tqdm(enumerate(Dt)):
+    for i, T in (enumerate(Dt)):
         start = durations[i]
         def local_vol_f_shifted(x,t):
             return local_vol_f(x, t+start)
