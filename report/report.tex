@@ -182,21 +182,24 @@ Thus, Black-Scholes predicts that if $\sigma$ is indeed a constant, then for any
 option written on the same underlying (regardless of strike price or expiry),
 that the implied volatility will be (approximately) constant. However, this is
 directly counterfactual to the options prices that we observe. For example,
-looking at the prices of AAPL options that expire on January 2018 retrieved on
-November 20$^\text{th}$, 2017 from Yahoo Finance, we get the following curve
+looking at the prices of AAPL options that expire on April 2018 retrieved on
+December 17$^\text{th}$, 2017 from Yahoo Finance, we get the following curve
 
 \begin{center}
 \includegraphics{figs/aapliv}
 \end{center}
 
-While the data is noisy, particularly for deep-in-the money\footnote{An option is said to be \emph{in-the-money} when its payoff is positive if $S_T = S_0$, \emph{out-of-the-money} when its payoff is negative if $S_T = S_0$, and \emph{at-the-money} otherwise.} puts
-which are hardly ever traded, the graph is unmistakably not constant. Moreover,
-AAPL is not an exception: most graphs of implied volatility versus strike have a
-similar shape. These deviations from Black-Scholes also correspond to
-intuitive qualitative ideas. If the price of AAPL has just plunged 50\%, it is
-palatable to think there is a lot of investor uncertainty, and that the future
-price of AAPL will diffuse with higher volatility than if it is just up 5\%.
-Thus, the assumption of constant $\sigma$ is suspect.
+While the data is noisy, particularly for deep-in-the money\footnote{A call
+(resp. put) option is said to be \emph{in-the-money} when $S_0 > K$ (resp. $S_0
+< K$), \emph{out-of-the-money} when $S_0 < K$ (resp. $S_0 > K$), and at the
+money if $S_0 = K$.} puts which are hardly ever traded, the graph is
+unmistakably not constant. Moreover, AAPL is not an exception: most graphs of
+implied volatility versus strike have a similar shape. These deviations from
+Black-Scholes also correspond to intuitive qualitative ideas. If the price of
+AAPL has just plunged 50\%, it is palatable to think there is a lot of investor
+uncertainty, and that the future price of AAPL will diffuse with higher
+volatility than if it is just up 5\%.  Thus, the assumption of constant $\sigma$
+is suspect.
 
 \section{Local Volatility Theory}
 \label{sec:localvoltheory}
