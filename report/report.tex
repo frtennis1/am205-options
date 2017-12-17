@@ -369,42 +369,16 @@ For values of $\diff{^2C}{K^2}$ sufficiently large, it is plausible that these a
 
 \section{Code}
 
-\begin{lstlisting}[
-    caption=Sampling from Risk-Neutral $S_T$ Distribution,
-    label=lst:sampleendprice]
-def sample_end_price(S0, local_vol_f, duration, n_intervals, n_samples):
-    """
-    Inputs
-    ------
-    S0 : float
-        The initial spot price of the asset at time t=0
-        
-    local_vol_f : float -> float (vectorized)
-        The local volatility at a given spot price (assumed constant over time)
-        
-    duration : float
-        The time to expiry, i.e. T.
-    
-    n_intervals : float
-        Number of intervals into which to break up the numerical simulation
-    
-    n_samples : int
-        Number of simulations to run
-        
-    Output
-    -----
-    S : NumPy float vector of length n_samples
-        The ending spot prices of the asset diffusion for each simulation
-    """
-    scaling_factor = duration / np.sqrt(n_intervals)
-    S = np.zeros((n_samples, n_intervals+1))
-    S[:,0] = S0
-    for i in range(1,n_intervals+1):
-        local_vols = local_vol_f(S[:,i-1])
-        growth_factor = np.exp(local_vols * np.random.randn(n_samples) * scaling_factor)
-        S[:,i] = S[:,i-1] * growth_factor
-    return S[:,-1]
-\end{lstlisting}
+\lstinputlisting[
+    caption=Sampling from risk-neutral $S_T$ distribution,
+    label=lst:sampleendprice]{scripts/sampleendprice.py}
 
+\lstinputlisting[
+    caption=Pricing call option from Monte-Carlo samples,
+    label=lst:pricecall]{scripts/pricecall.py}
+
+\lstinputlisting[
+    caption=Price using Black-Scholes formula,
+    label=lst:blackscholesprice]{scripts/blackscholesprice.py}
 
 \end{document}
