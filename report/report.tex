@@ -128,9 +128,13 @@ because the owner will only exercise it if the underlying is worth more than the
 strike price. This function gives rise the characteristic ``hockey-stick''
 payoff diagram of an option at expiry,
 
-\begin{center}
+\begin{figure}[h]
+\centering
 \includegraphics{figs/calloptpayoff}
-\end{center}
+\caption{Payoff of call option}
+\label{fig:calloptpayoff}
+\end{figure}
+
 
 The payoff of a put option is very similar to equation \ref{eqn:callpayoff},
 \begin{equation}
@@ -140,9 +144,12 @@ because the owner of the option will only exercise it if the underlying is worth
 less than the strike price, 
 and the payoff curve looks like its mirror image,
 
-\begin{center}
+\begin{figure}[h]
+\centering
 \includegraphics{figs/putoptpayoff}
-\end{center}
+\caption{Payoff of put option}
+\label{fig:putoptpayoff}
+\end{figure}
 
 \subsection{Risk-Neutral Pricing}
 \label{subsec:riskneutral}
@@ -187,9 +194,12 @@ directly counterfactual to the options prices that we observe. For example,
 looking at the prices of AAPL options that expire on April 2018 retrieved on
 December 17$^\text{th}$, 2017 from Yahoo Finance, we get the following curve
 
-\begin{center}
+\begin{figure}[h]
+\centering
 \includegraphics{figs/aapliv}
-\end{center}
+\caption{Implied volatility from AAPL options.}
+\label{fig:aapliv}
+\end{figure}
 
 While the data is noisy, particularly for deep-in-the money\footnote{A call
 (resp. put) option is said to be \emph{in-the-money} when $S_0 > K$ (resp. $S_0
@@ -343,9 +353,27 @@ Let $A = \diff{C}{T} + e_1$ and $B = \diff{^2C}{K^2} + e_2$ be two approximation
 Thus the absolute error \[
 \abs{\frac{A}{\frac{1}{2}K^2 B} - \sigma^2} \le \sigma^2 \abs{\frac{e_2}{\diff{^2C}{K^2}+e_2}} + \abs{\frac{e_1}{\frac{1}{2}K^2B}}.
 \]
-Since $\diff{^2C}{K^2} > 0$, it should be unsurprising that the error vanishes as $e_1,e_2 \to 0$. However, note that deep-in-the-money options are virtually indistinguishable from the underlying asset, whereas deep-out-of-the-money options are virtually worthless. Thus $C$ is almost linear as a function of $K$ when $K$ is away from $S_0$.
-%TODO: figure
-Even though $\diff{^2C}{K^2} > 0$, the infimum of this second derivative is zero. This presents a first difficulty when attempting to bound the error of the approximations. A second challenge arises from the discreteness of empirical prices. We cannot evaluate the function $C(K,T)$ anywhere we wish, but rather we only observe its values on a grid whose fineness is capped at the finest intervals that prices are quoted in. To make matters worse, the prices quoted are accurate to $\$0.01$, and so it is as if we are working in a world where machine precision is nontrivially large.
+Since $\diff{^2C}{K^2} > 0$, it should be unsurprising that the error vanishes
+as $e_1,e_2 \to 0$. However, note that deep-in-the-money options are virtually
+indistinguishable from the underlying asset, whereas deep-out-of-the-money
+options are virtually worthless. Thus $C$ is almost linear as a function of $K$
+when $K$ is away from $S_0$.
+
+\begin{figure}[h]
+\centering
+\includegraphics{figs/intrinsicvalue}
+\caption{Option Intrinsic and Time Value}
+\label{fig:intrinsicvalue}
+\end{figure}
+
+Even though $\diff{^2C}{K^2} > 0$, the infimum of this second derivative is
+zero. This presents a first difficulty when attempting to bound the error of the
+approximations. A second challenge arises from the discreteness of empirical
+prices. We cannot evaluate the function $C(K,T)$ anywhere we wish, but rather we
+only observe its values on a grid whose fineness is capped at the finest
+intervals that prices are quoted in. To make matters worse, the prices quoted
+are accurate to $\$0.01$, and so it is as if we are working in a world where
+machine precision is nontrivially large.
 
 
 The usual centered difference approximations have \[
