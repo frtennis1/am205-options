@@ -76,7 +76,8 @@
 \title{A Numerical Exploration of the Local Volatility Model for Option Pricing}
 \author{Francisco Rivera\thanks{Harvard College, 
 \href{mailto:frivera@college.harvard.edu}{frivera@college.harvard.edu} 
-} \and Jiafeng Chen\thanks{Harvard College, \href{mailto:jiafengchen@college.harvard.edu}{jiafengchen@college.harvard.edu}}}
+} \and Jiafeng Chen\thanks{Harvard College,
+\href{mailto:jiafengchen@college.harvard.edu}{jiafengchen@college.harvard.edu}}}
 \date{\today}
 
 \maketitle
@@ -448,6 +449,25 @@ local volatility function since we must estimate it. This means that we also
 care about the pricing \emph{sensitivy}, i.e.\ how prices change for a change in
 the local volatility function.
 
+In general, the sensitivity will be contingent both on the local volatility
+function as well as which parts of the function are changing. Since we are only
+interested in a gauge of how sensitive these quantities are, we will restrict
+ourselves to the case where the local volatility function is constant and we
+shift the entire function up. In this case, we are in a Black-Scholes world and
+this sensitivity---called Vega---has a closed form. We can plot the values of
+vega for two $\$100$-stocks with $16\%$ and $24\%$ volatility respectively in
+Figure \ref{fig:vega},
+
+\begin{figure}[h!]
+\centering
+\includegraphics{figs/vega.eps}
+\caption{Option Vega}
+\label{fig:vega}
+\end{figure}
+
+\noindent noting that $0.40$ vega means that if volatility goes up by $1\%$,
+then the price of the option goes up by $\$0.40$. 
+
 
 \section{Fitting Local Volatility}
 \label{sec:localvolfitting}
@@ -470,11 +490,13 @@ the local volatility function.
 However, computing $\sigma^2$ from observed data accurately is a much more
 difficult task. We illustrate the main difficulty below.
 
-Let $A = \diff{C}{T} + e_1$ and $B = \diff{^2C}{K^2} + e_2$ be two approximations. Then \[
-\frac{A}{\frac{1}{2}K^2 B} = \sigma^2 \frac{\diff{^2C}{K^2}}{\diff{^2C}{K^2} + e_2} + \frac{e_1}{\frac{1}{2}K^2 B}.
+Let $A = \diff{C}{T} + e_1$ and $B = \diff{^2C}{K^2} + e_2$ be two
+approximations. Then \[ \frac{A}{\frac{1}{2}K^2 B} = \sigma^2
+\frac{\diff{^2C}{K^2}}{\diff{^2C}{K^2} + e_2} + \frac{e_1}{\frac{1}{2}K^2 B}.
 \]
 Thus the absolute error \[
-\abs{\frac{A}{\frac{1}{2}K^2 B} - \sigma^2} \le \sigma^2 \abs{\frac{e_2}{\diff{^2C}{K^2}+e_2}} + \abs{\frac{e_1}{\frac{1}{2}K^2B}}.
+\abs{\frac{A}{\frac{1}{2}K^2 B} - \sigma^2} \le \sigma^2
+\abs{\frac{e_2}{\diff{^2C}{K^2}+e_2}} + \abs{\frac{e_1}{\frac{1}{2}K^2B}}.
 \]
 Since $\diff{^2C}{K^2} > 0$, it should be unsurprising that the error vanishes
 as $e_1,e_2 \to 0$. However, note that deep-in-the-money options are virtually
