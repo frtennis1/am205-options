@@ -100,6 +100,8 @@ price out-of-sample options.
 
 \newpage
 
+\section{Introduction}
+
 \section{Background}
 \label{sec:background}
 
@@ -212,7 +214,7 @@ uncertainty, and that the future price of AAPL will diffuse with higher
 volatility than if it is just up 5\%.  Thus, the assumption of constant $\sigma$
 is suspect.
 
-\section{Local Volatility Theory}
+\subsection{Local Volatility Theory}
 \label{sec:localvoltheory}
 
 The \emph{local-volatility model} directly responds this shortcoming of the
@@ -267,7 +269,7 @@ local volatility model can perfectly fit what we see, and we should be
 apprehensive of overfitting.
 
 
-\section{Pricing with Local Volatility}
+\section{Monte Carlo Pricing}
 \label{sec:localvolpricing}
 
 In this section, we will concern ourselves with what we can do once we have the
@@ -275,9 +277,6 @@ local volatility surface. In particular, our main objective will be to
 price options. Note that the prices may exist in the market (e.g.\ as a sanity
 check for our model), or they may not (e.g.\ to price options with expiries that
 are not quoted, giving our model predictive power).
-
-\subsection{Monte-Carlo Methods}
-\label{subsec:montecarlopricing}
 
 One way to do this is by realizing that the price is an expectation under the
 risk-neutral distribution of the pay-off random variable (as in Equation
@@ -293,8 +292,11 @@ number of draws from the distribution, our sample mean will differ from the true
 mean by a quantity that decreases with $\sqrt{n}$. Harder to reason about is the
 discretization error that we introduce. 
 
+\subsection{Sampling Error}
 
-\subsection{Discretization Error}
+Decreases in $\sqrt{n}$. $\mathbb{QED}$
+
+\subsection{Discretization Error (Theory)}
 In Monte Carlo pricing, we draw from the distribution of $S_T$ and compute option prices. We start with the stochastic difference equation\footnote{We assume interest rates are zero, and so there is no drift term for simplicity} \[
 dS_t = S_t \sigma(S_t,t) \, dW_t,
 \]
@@ -319,7 +321,10 @@ Since we apply Euler-Murayama method to option pricing, we are more interested i
 \]
 where $\norm{g-\tilde g}_\infty$ can be arbitrarily small. 
 
-\paragraph{Numerical experiment of first-order convergence of discretization error} Let $S_0 = 1, K = 1.1$, and \[\sigma(S, t) = \min\pr{0.1 + (S - 1)^2, 0.5}.\] Consider a call option at expiry $T = 1$ with strike $K$, whose payoff is $\max(S_T, K) - K$. Assume zero interest rate. We approximate the expectation with sample mean with sample size $10^6$. We approximate the true value of the option by computing the Euler-Murayama approximation with step-size equalling $1/200$. We then plot the pricing errors of Euler-Murayama approximations with step size $1/n$ for $n=1,\ldots,40$ in Figure~\ref{fig:log-log}. 
+
+\subsection{Discretization Error (Numerical Experiment)}
+
+Let $S_0 = 1, K = 1.1$, and \[\sigma(S, t) = \min\pr{0.1 + (S - 1)^2, 0.5}.\] Consider a call option at expiry $T = 1$ with strike $K$, whose payoff is $\max(S_T, K) - K$. Assume zero interest rate. We approximate the expectation with sample mean with sample size $10^6$. We approximate the true value of the option by computing the Euler-Murayama approximation with step-size equalling $1/200$. We then plot the pricing errors of Euler-Murayama approximations with step size $1/n$ for $n=1,\ldots,40$ in Figure~\ref{fig:log-log}. 
 
 \begin{figure}[h!]
     \centering
@@ -331,6 +336,10 @@ It is difficult to control the Monte Carlo sampling error, due to computational 
   
 
 Thus, for a known $\sigma^2$, we can limit the size of the discretization error at rate $O(\Delta t)$, and the size of the sampling error at rate $O(n^{-1/2})$ where $n$ is the sample size. The theory and the numerical experimentation suggests that the Monte Carlo pricing method is numerically robust. 
+
+
+\subsection{Sensitivity to Local Volatility Estimation}
+
 
 
 \section{Fitting Local Volatility}
@@ -346,7 +355,7 @@ Thus, for a known $\sigma^2$, we can limit the size of the discretization error 
 % Second, given an estimate of the local volatility $\sigma^2$, we numerically predict option prices. In this section, we discuss some theoretical difficulties in deriving analytical bounds on our approximations. In particular, we proceed in reverse order. We first discuss the numerical errors of Monte Carlo pricing, assuming the local volatility $\sigma^2$ is known.
 
 
-\subsection{Theoretical Analysis}
+\subsection{Theoretical Difficulties}
 However, computing $\sigma^2$ from observed data accurately is a much more difficult task. We illustrate the main difficulty below.
 
 Let $A = \diff{C}{T} + e_1$ and $B = \diff{^2C}{K^2} + e_2$ be two approximations. Then \[
@@ -382,12 +391,20 @@ The usual centered difference approximations have \[
 |e_1|\le \frac{h_1^2}{6}\sup \abs{\diff{^3C}{T^3}} + \frac{\epsilon}{2h_1} \qquad |e_2| \le \frac{h_2^2}{12}\sup \abs{\diff{^4C}{K^4}} + \frac{2\epsilon}{h_2^2}.
 \]
 For values of $\diff{^2C}{K^2}$ sufficiently large, it is plausible that these approximations are sufficiently accurate. However, the approximation is certainly not accurate for values of $\diff{^2C}{K^2}$ close to zero. Yet for these values, which correspond to deep-money options, the option price is virtually known---the large errors in $\sigma^2$ for $K$ far away from $S_0$ is weighted by the extremely small probability that such errors matter. Such weighting is analytically intractable, and we mainly focus on numerical experimentation. 
+ 
+\subsection{Proposed Methods}
 
 
+ 
+\section{Numerical Experiment}
+
+\subsection{Methods}
+
+\subsection{Results}
 
 
+\section{Discussion and Conclusion}
 
-\section{Conclusions}
 
 \bibliographystyle{chicago}
 \bibliography{am205.bib}
