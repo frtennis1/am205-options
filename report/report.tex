@@ -319,6 +319,19 @@ Since we apply Euler-Murayama method to option pricing, we are more interested i
 \]
 where $\norm{g-\tilde g}_\infty$ can be arbitrarily small. 
 
+\paragraph{Numerical experiment of first-order convergence of discretization error} Let $S_0 = 1, K = 1.1$, and \[\sigma(S, t) = \min\pr{0.1 + (S - 1)^2, 0.5}.\] Consider a call option at expiry $T = 1$ with strike $K$, whose payoff is $\max(S_T, K) - K$. Assume zero interest rate. We approximate the expectation with sample mean with sample size $10^6$. We approximate the true value of the option by computing the Euler-Murayama approximation with step-size equalling $1/200$. We then plot the pricing errors of Euler-Murayama approximations with step size $1/n$ for $n=1,\ldots,40$ in Figure~\ref{fig:log-log}. 
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figs/montecarlo_discrete.png}
+    \caption{Log-log plot of pricing error against $\Delta t$}
+    \label{fig:log-log}
+\end{figure}
+It is difficult to control the Monte Carlo sampling error, due to computational resource constraints, but we do observe approximately a first-order convergence pattern. 
+  
+
+Thus, for a known $\sigma^2$, we can limit the size of the discretization error at rate $O(\Delta t)$, and the size of the sampling error at rate $O(n^{-1/2})$ where $n$ is the sample size. The theory and the numerical experimentation suggests that the Monte Carlo pricing method is numerically robust. 
+
 
 \section{Fitting Local Volatility}
 \label{sec:localvolfitting}
@@ -369,6 +382,8 @@ The usual centered difference approximations have \[
 |e_1|\le \frac{h_1^2}{6}\sup \abs{\diff{^3C}{T^3}} + \frac{\epsilon}{2h_1} \qquad |e_2| \le \frac{h_2^2}{12}\sup \abs{\diff{^4C}{K^4}} + \frac{2\epsilon}{h_2^2}.
 \]
 For values of $\diff{^2C}{K^2}$ sufficiently large, it is plausible that these approximations are sufficiently accurate. However, the approximation is certainly not accurate for values of $\diff{^2C}{K^2}$ close to zero. Yet for these values, which correspond to deep-money options, the option price is virtually known---the large errors in $\sigma^2$ for $K$ far away from $S_0$ is weighted by the extremely small probability that such errors matter. Such weighting is analytically intractable, and we mainly focus on numerical experimentation. 
+
+
 
 
 
