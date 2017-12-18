@@ -32,7 +32,8 @@ discreteness in real world data.
 
 7. The `report/scripts` directory includes the most relevant functions that were
    defined for the project, as well as the `.py` files in the main directory
-   (i.e. <interpolated_local_vol.py> and <sample_prices.py>).
+   (i.e. [interpolated_local_vol.py](interpolated_local_vol.py) and
+   [sample_prices](sample_prices.py)).
 
 
 
