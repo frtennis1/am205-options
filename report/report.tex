@@ -435,10 +435,9 @@ option by computing the Euler-Murayama approximation with step-size equalling
 $1/200$. We then plot the pricing errors of Euler-Murayama approximations with
 step size $1/n$ for $n=1,\ldots,40$ in Figure~\ref{fig:log-log}. 
 
-% TODO: can we get a similar figure aesthetic for this? -FR
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.5\textwidth]{figs/montecarlo_discrete.png}
+    \includegraphics{figs/montecarlo_discrete.eps}
     \caption{Log-log plot of pricing error against $\Delta t$}
     \label{fig:log-log}
 \end{figure}
@@ -760,7 +759,8 @@ these right tail events.
 % but hard to say what that would even look like. Saying we're happy with
 % performance without a comparative benchmark feels dissatisfying...
 
-% TODO: is a future work section in order?
+\subsection{Future Work}
+
 
 
 \bibliographystyle{chicago}
@@ -784,6 +784,21 @@ these right tail events.
 \lstinputlisting[
     caption=Price using Black-Scholes formula,
     label=lst:blackscholesprice]{scripts/blackscholesprice.py}
+
+
+\lstinputlisting[
+    caption=Local Volatility Pricer,
+    label=lst:lvpricer]{scripts/localvolatilitypricer.py}
+    
+\lstinputlisting[
+    caption=Fitters Used,
+    label=lst:fitter]{scripts/fitters.py}
+    
+\lstinputlisting[
+    caption=Example of Using \texttt{LocalVolatilityPricer},
+    label=lst:fitter]{scripts/api_example.py}
+
+
 
 % TODO: do we need more listings?
 
