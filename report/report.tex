@@ -81,18 +81,18 @@
 \maketitle
 
 % \begin{abstract}
-% In Nobel-prize winning work, Black, Merton, and Scholes \citep{black1973pricing} developed a model to
-% price options. The tractability of the model revolutionized options pricing and
-% allowed for the derivatives to become widely traded. However, the predictions of
-% the model run counterfactual to empirically observed prices. In this paper, we
-% consider a generalization to the Black-Scholes model, the local-volatility
-% model. This generalization gives us more degrees of freedom to fit the prices we
-% observe, but with the additional expressiveness come numerical complications.
-% Black-Scholes requires fitting only a single number known as the \emph{implied
-% volatility}, but the local volatility model requires fitting an entire
-% multi-dimensional function. We explore these complications and arrive at
-% solutions that are assessed for numerical stability and accuracy to price
-% options.
+% In Nobel-prize winning work, Black, Merton, and Scholes
+% \citep{black1973pricing} developed a model to price options. The tractability
+% of the model revolutionized options pricing and allowed for the derivatives to
+% become widely traded. However, the predictions of the model run counterfactual
+% to empirically observed prices. In this paper, we consider a generalization to
+% the Black-Scholes model, the local-volatility model. This generalization gives
+% us more degrees of freedom to fit the prices we observe, but with the
+% additional expressiveness come numerical complications.  Black-Scholes
+% requires fitting only a single number known as the \emph{implied volatility},
+% but the local volatility model requires fitting an entire multi-dimensional
+% function. We explore these complications and arrive at solutions that are
+% assessed for numerical stability and accuracy to price options.
 % \end{abstract}
 
 % \tableofcontents
@@ -102,11 +102,38 @@
 
 \section{Introduction}
 
-Option pricing is a growing field ever since the groundbreaking work of \cite{black1973pricing}. In the Black-Scholes model, the underlying security is assumed to follow a geometric Brownian motion---a process with constant volatility. Such an assumption, while mathematically elegant, does not agree with empirical observations. To remedy this weakness, \cite{dupire1997pricing} developed the \emph{local volatility model}, where volatility is assumed to be a function of price and time. \cite{dupire1997pricing}'s equation \eqref{eqn:dupire} calculates local volatility analytically from option prices. However, in order to put \cite{dupire1997pricing}'s result into practice, we need to estimate local volatility functions from data and to predict option prices from local volatility functions in a numerically stable and statistically robust manner.
+Option pricing is a growing field ever since the groundbreaking work of
+\cite{black1973pricing}. In the Black-Scholes model, the underlying security is
+assumed to follow a geometric Brownian motion---a process with constant
+volatility. Such an assumption, while mathematically elegant, does not agree
+with empirical observations. To remedy this weakness, \cite{dupire1997pricing}
+developed the \emph{local volatility model}, where volatility is assumed to be a
+function of price and time. \cite{dupire1997pricing}'s equation
+\eqref{eqn:dupire} calculates local volatility analytically from option prices.
+However, in order to put \cite{dupire1997pricing}'s result into practice, we
+need to estimate local volatility functions from data and to predict option
+prices from local volatility functions in a numerically stable and statistically
+robust manner.
 
-This report proposes and tests two approaches of inference and prediction and analyze the errors both  in  a theoretical manner and through numerical experiments. We estimate Dupire's equation via finite difference approximations of the derivatives and via local quadratic approximations of the option price surface to estimate derivatives. We then use Monte Carlo methods to price options given a local volatility surface. We find that both approaches generate a similar magnitude of errors. We find that the errors are relatively small for at-the-money options, but are large for deep-money options. 
+This report proposes and tests two approaches of inference and prediction and
+analyze the errors both  in  a theoretical manner and through numerical
+experiments. We estimate Dupire's equation via finite difference approximations
+of the derivatives and via local quadratic approximations of the option price
+surface to estimate derivatives. We then use Monte Carlo methods to price
+options given a local volatility surface. We find that both approaches generate
+a similar magnitude of errors. We find that the errors are relatively small for
+at-the-money options, but are large for deep-money options. 
 
-This report proceeds as follows. Section~\ref{sec:background} introduces some background on option pricing, local volatility theory, and Dupire's equation. Section~\ref{sec:localvolpricing} outlines our approach to pricing options given known local volatility functions or estimates thereof and discusses theoretical results regarding the errors of these methods. Section~\ref{sec:localvolfitting} describes our approach to fit local volatility functions given observed option price data, and discusses some theoretical difficulties regarding error analysis. Section~\ref{sec:numericalexp} describes the procedure and results of our numerical experiments testing the approach outlined in the previous sections. Section~\ref{sec:conc} discusses the results and concludes.
+This report proceeds as follows. Section~\ref{sec:background} introduces some
+background on option pricing, local volatility theory, and Dupire's equation.
+Section~\ref{sec:localvolpricing} outlines our approach to pricing options given
+known local volatility functions or estimates thereof and discusses theoretical
+results regarding the errors of these methods. Section~\ref{sec:localvolfitting}
+describes our approach to fit local volatility functions given observed option
+price data, and discusses some theoretical difficulties regarding error
+analysis. Section~\ref{sec:numericalexp} describes the procedure and results of
+our numerical experiments testing the approach outlined in the previous
+sections. Section~\ref{sec:conc} discusses the results and concludes.
 
 \section{Background}
 \label{sec:background}
@@ -513,12 +540,32 @@ then we will get point estimates for all points on the inside of the grid.
 \label{fig:localvolgrid}
 \end{figure}
 
+Then, we can estimate the first partial derivative with respect to expiry using
+a central difference, and the second partial derivative with respect to strike
+using the second-order central finite difference. However, when pricing options,
+we do not just need the local volatility at a discrete grid of points. Thus, we
+need a way to use our grid of point estimates to get estimates at any point. To
+this end, we employ two main approaches. The first is to simply use the closest
+point-estimate (for instance, the shaded area represents the expanse of one
+point estimate), to get a piece-wise constant function. The second approach is
+to perform a bilinear interpolation on the grid.
+
 
 \subsection{Local Quadratic Regression}
 
-Another method to estimate local volatility that we test is by approximating $C$ locally quadratically in order to get analytic first- and second-derivatives. For any point in the interior of the grid as in Figure~\ref{fig:localvolgrid}, we consider the stencil formed by the point and its eight surrounding neighbors. We then fit a regression on the feature vector $(1,K,T,K^2, KT,T^2)$ for each of the nine points. Since we need to estimate six coefficients and we have nine data points, the linear system is over-identified, lending well to fitting a linear regression. We estimate $\diff{C}{T}$ and $\diff{^2C}{K^2}$ by differentiating the best-fit quadratic surface.
+Another method to estimate local volatility that we test is by approximating $C$
+locally quadratically in order to get analytic first- and second-derivatives.
+For any point in the interior of the grid as in Figure~\ref{fig:localvolgrid},
+we consider the stencil formed by the point and its eight surrounding neighbors.
+We then fit a regression on the feature vector $(1,K,T,K^2, KT,T^2)$ for each of
+the nine points. Since we need to estimate six coefficients and we have nine
+data points, the linear system is over-identified, lending well to fitting a
+linear regression. We estimate $\diff{C}{T}$ and $\diff{^2C}{K^2}$ by
+differentiating the best-fit quadratic surface.
 
-The approach is motivated by a concern that finite differences may give estimates that are too volatile, where we attempt to enforce some continuity by estimating a quadratic function locally on the option price surface.
+The approach is motivated by a concern that finite differences may give
+estimates that are too volatile, where we attempt to enforce some continuity by
+estimating a quadratic function locally on the option price surface.
 
 
 \subsection{Theoretical Difficulties}
@@ -572,21 +619,31 @@ weighting is analytically intractable, and we mainly focus on numerical
 experimentation. 
  
 % \subsection{Proposed Methods}
-
-
  
 \section{Numerical Experiment}
 \label{sec:numericalexp}
 
 \subsection{Methods}
-We conduct numerical experiments with local volatility functions in the following analytic forms, which are plotted in Figure~\ref{fig:local_vols}: \begin{align*}
+We conduct numerical experiments with local volatility functions in the
+following analytic forms, which are plotted in Figure~\ref{fig:local_vols}:
+\begin{align*}
 \sigma_1(S,t) &= \min(.16 + 10^{-4}(S-100)^2, .5) \tag{Quadratic}\\
 \sigma_2(S,t) &= 0.2\cos^2(0.1(S-100)) + 0.16 \tag{Sinusoidal}\\
 \sigma_3(S,t) &= 0.24 + \frac{0.1}{1+\exp(0.2(S-100))} \tag{Logistic} \\
 \sigma_4(S,t) &= \text{clip}(0.16 + 300^{-1}(S - 100),0,1) \tag{Linear}
 \end{align*}
-For simplicity, we assume none of these are dependent on $t$. For each local volatility function, we simulated the movement of the underlying for one year with 100 intervals per year, and calculated simulated \emph{true} option prices for each month, with \$1 apart strike prices based on $10^5$ samples. To further reduce Monte Carlo error in the true prices, we average them over 100 trials of the above procedure (The $t=1$ prices for each local volatility function are plotted in Figure~\ref{fig:prices}.
-). We apply the procedures with the following caveat. We clip estimates of $\diff{C}{T}$ to zero if they become negative, since $\diff{C}{T} < 0$ violates a no-arbitrage condition. We assume estimates of $\diff{^2C}{K^2}$ as to be \texttt{NaN} if it is smaller than some threshold of tolerance. We use a tolerance of $0.01$ for the quadratic model, and $0.005$ for other $\sigma$s. 
+For simplicity, we assume none of these are dependent on $t$. For each local
+volatility function, we simulated the movement of the underlying for one year
+with 100 intervals per year, and calculated simulated \emph{true} option prices
+for each month, with \$1 apart strike prices based on $10^5$ samples. To further
+reduce Monte Carlo error in the true prices, we average them over 100 trials of
+the above procedure (The $t=1$ prices for each local volatility function are
+plotted in Figure~\ref{fig:prices}.). We apply the procedures with the following
+caveat. We clip estimates of $\diff{C}{T}$ to zero if they become negative,
+since $\diff{C}{T} < 0$ violates a no-arbitrage condition. We assume estimates
+of $\diff{^2C}{K^2}$ as to be \texttt{NaN} if it is smaller than some threshold
+of tolerance. We use a tolerance of $0.01$ for the quadratic model, and $0.005$
+for other $\sigma$s. 
  
 \begin{figure}[h]
   \centering
@@ -595,7 +652,16 @@ For simplicity, we assume none of these are dependent on $t$. For each local vol
   \label{fig:local_vols}
 \end{figure}
 
-Then, we apply the methods discussed in Section~\ref{sec:localvolfitting} to each observed true prices. Since the true prices form a grid, we obtain a grid of estimated local volatility. We construct a function $\tilde\sigma$ over all values of $S,t$ from its observed values on a grid by taking the nearest neighbor, i.e., the $\tilde \sigma$-image of a point $S,t$ not in the grid is the closest observed local volatility estimate. This is implemented via the library function \texttt{NearestNDInterpolator} in \texttt{scipy.interpolate}. We then use the interpolated $\tilde \sigma$ to price options via Monte Carlo pricing, as in Section~\ref{sec:localvolpricing}. We then compare the predicted prices to the actual prices.
+Then, we apply the methods discussed in Section~\ref{sec:localvolfitting} to
+each observed true prices. Since the true prices form a grid, we obtain a grid
+of estimated local volatility. We construct a function $\tilde\sigma$ over all
+values of $S,t$ from its observed values on a grid by taking the nearest
+neighbor, i.e., the $\tilde \sigma$-image of a point $S,t$ not in the grid is
+the closest observed local volatility estimate. This is implemented via the
+library function \texttt{NearestNDInterpolator} in \texttt{scipy.interpolate}.
+We then use the interpolated $\tilde \sigma$ to price options via Monte Carlo
+pricing, as in Section~\ref{sec:localvolpricing}. We then compare the predicted
+prices to the actual prices.
 \begin{figure}[h!]
   \centering
   \includegraphics{figs/end_calls.eps}
@@ -605,25 +671,40 @@ Then, we apply the methods discussed in Section~\ref{sec:localvolfitting} to eac
 
 
 \subsection{Results}
-We plot in Figure~\ref{fig:fits} the true local volatility function and the fitted local volatility function at $t=0$ (initial) and $t=1$ (final). At values far away from $S_0 = 100$, all estimates of $\diff{^2C}{K^2} \approx 0$, and so we discard the estimates. Since we are using the nearest-neighbor interpolation method, $\tilde\sigma$ values outside a band around $S_0 = 100$ are clipped to the boundary values around the band. These are values far away from the strike, and so they are unlikely to be incurred. We see that the errors are visible when $t = 0$, but small when $t=1$. We hypothesize that this is due to the fact that the option prices near $t=0$ are close to piecewise linear, making the estimates of $\diff{^2C}{K^2}$ imprecise.
+We plot in Figure~\ref{fig:fits} the true local volatility function and the
+fitted local volatility function at $t=0$ (initial) and $t=1$ (final). At values
+far away from $S_0 = 100$, all estimates of $\diff{^2C}{K^2} \approx 0$, and so
+we discard the estimates. Since we are using the nearest-neighbor interpolation
+method, $\tilde\sigma$ values outside a band around $S_0 = 100$ are clipped to
+the boundary values around the band. These are values far away from the strike,
+and so they are unlikely to be incurred. We see that the errors are visible when
+$t = 0$, but small when $t=1$. We hypothesize that this is due to the fact that
+the option prices near $t=0$ are close to piecewise linear, making the estimates
+of $\diff{^2C}{K^2}$ imprecise.
  
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\textwidth]{figs/fits.eps}
-  \caption{The fitted local volatility functions; the top two rows are finite-difference fits and the bottom two rows are local quadratic regression fits; the odd rows are $t=0$ and the even rows are $t=1$ year.}
+  \caption{The fitted local volatility functions; the top two rows are
+finite-difference fits and the bottom two rows are local quadratic regression
+fits; the odd rows are $t=0$ and the even rows are $t=1$ year.}
   \label{fig:fits}
 \end{figure}
 
-We plot the pricing errors in Figure~\ref{fig:errors}. We observe that the horizontal stripes, which represent Monte Carlo error, are on the order of $10^{-2}$. Pricing errors, except for far-out-of-money calls, appear to be on the order of $\$0.05$--$\$0.10$, which is about $1\%$ error for options that is near at-the-money.
+We plot the pricing errors in Figure~\ref{fig:errors}. We observe that the
+horizontal stripes, which represent Monte Carlo error, are on the order of
+$10^{-2}$. Pricing errors, except for far-out-of-money calls, appear to be on
+the order of $\$0.05$--$\$0.10$, which is about $1\%$ error for options that is
+near at-the-money.
 
 \begin{figure}[h!]
   \centering
   \includegraphics{figs/errors.eps}
-  \caption{Errors obtained on four local volatility functions; the top row is errors using finite difference and the bottom row is errors using local quadratic regressions}
+  \caption{Errors obtained on four local volatility functions; the top row is
+     errors using finite difference and the bottom row is errors using local
+     quadratic regressions}
   \label{fig:errors}
 \end{figure}
-
-
 
 
 \section{Discussion and Conclusion}
