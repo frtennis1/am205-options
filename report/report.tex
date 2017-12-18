@@ -76,7 +76,8 @@
 \title{A Numerical Exploration of the Local Volatility Model for Option Pricing}
 \author{Francisco Rivera\thanks{Harvard College, 
 \href{mailto:frivera@college.harvard.edu}{frivera@college.harvard.edu} 
-} \and Jiafeng Chen\thanks{Harvard College, \href{mailto:jiafengchen@college.harvard.edu}{jiafengchen@college.harvard.edu}}}
+} \and Jiafeng Chen\thanks{Harvard College,
+\href{mailto:jiafengchen@college.harvard.edu}{jiafengchen@college.harvard.edu}}}
 \date{\today}
 
 \maketitle
@@ -84,16 +85,16 @@
 \begin{abstract}
 In Nobel-prize winning work, Black, Merton, and Scholes developed a model to
 price options. The tractability of the model revolutionized options pricing and
-allowed for the derivatives to become widely traded. However, the
-predictions of the model run counterfactual to empirically observed prices. In
-this paper, we consider a generalization to the Black-Scholes model, the
-local-volatility model. This generalization gives us more degrees of freedom to
-fit the prices we observe. With the additional expressiveness, however, come
-numerical complications. Black-Scholes requires fitting only a single number
-known as the \emph{implied volatility}, but the local volatility model requires
-fitting an entire multi-dimensional function. We explore these complications and
-arrive at solutions that are assessed for numerical stability and accuracy to
-price out-of-sample options.
+allowed for the derivatives to become widely traded. However, the predictions of
+the model run counterfactual to empirically observed prices. In this paper, we
+consider a generalization to the Black-Scholes model, the local-volatility
+model. This generalization gives us more degrees of freedom to fit the prices we
+observe. With the additional expressiveness, however, come numerical
+complications. Black-Scholes requires fitting only a single number known as the
+\emph{implied volatility}, but the local volatility model requires fitting an
+entire multi-dimensional function. We explore these complications and arrive at
+solutions that are assessed for numerical stability and accuracy to price
+out-of-sample options.
 \end{abstract}
 
 \tableofcontents
@@ -109,10 +110,11 @@ price out-of-sample options.
 \label{subsec:terminology}
 
 Before delving into the theoretical and numerical results, we briefly summarize
-options terminology. An option is a \emph{derivative} on some asset, henceforth called
-the \emph{underlying}---i.e.\ it's value is \emph{derived} from the value of the
-underlying. The owner of a call (resp. put) option has the right but not the obligation
-to buy (resp. sell) the underlying asset at a given price at some date in the future.
+options terminology. An option is a \emph{derivative} on some asset, henceforth
+called the \emph{underlying}---i.e.\ it's value is \emph{derived} from the value
+of the underlying. The owner of a call (resp. put) option has the right but not
+the obligation to buy (resp. sell) the underlying asset at a given price at some
+date in the future.
 
 The price at which the holder of the option can buy/sell is called the
 \emph{strike price}, denoted $K$. Invoking the right to buy or sell is called
@@ -174,12 +176,13 @@ assumption about what this risk-neutral distribution looks like.
 \label{subsec:bs}
 The Black-Scholes model makes one such assumption by writing how the asset
 diffuses over time. In particular, the Black-Scholes model treates the asset
-price as a geometric Brownian motion represented by the following stochastic difference equation:
+price as a geometric Brownian motion represented by the following stochastic
+difference equation:
 \begin{equation}
  \frac{dS}{S} = r dt + \sigma dW 
 \end{equation}
-where $W$ is Brownian motion and $\sigma$ is a constant value called the \emph{implied
-volatility}. 
+where $W$ is Brownian motion and $\sigma$ is a constant value called the
+\emph{implied volatility}. 
 
 This forces the risk-neutral distribution to be log-normal and makes
 finding the price analytically tractable. In particular, since the only pricing
@@ -231,9 +234,9 @@ this fact when we need to confirm the numerical results of the local volatility
 model against theoretical closed-forms.
 
 In the general case, though, we care about what the local volatility surface
-says about prices and vice-versa. To this end, we can invoke \cite{dupire1997pricing}. The first thing to note is that we can
-differentiate our risk-neutral pricing formula with respect to $K$ twice to get
-that,
+says about prices and vice-versa. To this end, we can invoke
+\cite{dupire1997pricing}. The first thing to note is that we can differentiate
+our risk-neutral pricing formula with respect to $K$ twice to get that,
 \begin{equation}
  e^{-rT} \phi(K, T; S_0) = \frac{\partial^2 C}{\partial K^2}.
 \end{equation}
@@ -244,7 +247,7 @@ display this without drift. In practice, we can do this for the underlying
 itself if is driftless, but if we are worried about drift, we can simply use the
 forward price which is by construction a martingale}
 \begin{equation}
- \frac{\partial C}{\partial T} = \frac{1}{2} e^{rT} \sigma^2 K^2 \frac{\partial^2
+\frac{\partial C}{\partial T} = \frac{1}{2} e^{rT} \sigma^2 K^2 \frac{\partial^2
 C}{\partial K^2}
 \end{equation}
 Rearranging gives us Dupire's equation,
@@ -263,83 +266,207 @@ There are a couple notable takeaways from this equation. First of all, if we
 fully and perfectly observed a continuum of option prices for all strikes and
 expiries, we would be able to uniquely determine the local volatility surface.
 Moreover, we can do this \emph{regardless} of what the option prices
-are\footnote{We get negative local volatility if arbitrage conditions are violated,
-but we assume this does not happen.}. This means that unlike Black-Scholes, the
-local volatility model can perfectly fit what we see, and we should be
-apprehensive of overfitting.
+are\footnote{We get negative local volatility if arbitrage conditions are
+violated, but we assume this does not happen.}. This means that unlike
+Black-Scholes, the local volatility model can perfectly fit what we see, and we
+should be apprehensive of overfitting.
 
 
 \section{Monte Carlo Pricing}
 \label{sec:localvolpricing}
 
 In this section, we will concern ourselves with what we can do once we have the
-local volatility surface. In particular, our main objective will be to 
-price options. Note that the prices may exist in the market (e.g.\ as a sanity
-check for our model), or they may not (e.g.\ to price options with expiries that
-are not quoted, giving our model predictive power).
+local volatility surface. In particular, our main objective will be to price
+options. Note that the prices may exist in the market (e.g.\ as a sanity check
+for our model), or they may not (e.g.\ to price options with expiries that are
+not quoted, giving our model predictive power).
 
 One way to do this is by realizing that the price is an expectation under the
 risk-neutral distribution of the pay-off random variable (as in Equation
-\ref{eqn:riskneutralpricing}). Thus, if we can sample
-from this distribution, we can invoke the law of large numbers and get an
-estimate for its average with sufficient samples. To this end, first we build a
-function that allows us to sample from the risk-neutral distribution of ending
-spot prices in Listing \ref{lst:sampleendprice}.
+\ref{eqn:riskneutralpricing}). Thus, if we can sample from this distribution, we
+can invoke the law of large numbers and get an estimate for its average with
+sufficient samples. 
+
+In Monte Carlo pricing, we draw from the distribution of $S_T$ and compute
+option prices. We start with the stochastic difference equation\footnote{We
+assume interest rates are zero, and so there is no drift term for simplicity}
+%
+\[ dS_t = S_t \sigma(S_t,t) \, dW_t, \]
+%
+and approximate with finite differences 
+%
+\begin{equation}
+\label{eq:euler-maruyama}
+\tilde S_{t_{k+1}} - \tilde S_{t_k} = \tilde S_{t_k} \sigma(\tilde S_{t_k},
+t_k)\, (W_{t_{k+1}} - W_{t_k}) = \tilde S_{t_k} \sigma(\tilde S_{t_k}, t_k)
+\sqrt{t_{k+1}-t_k} Z_k,
+\end{equation}
+%
+for some $Z_k = \frac{W_{t_{k+1}} - W_{t_k}}{\sqrt{t_{k+1}-t_k}} \sim
+\Norm(0,1)$. This is the well-known \emph{Euler-Maruyama method}, an extension
+of the forward Euler method in stochastic calculus. It has been shown that the
+recursively-computed sequence $\tilde S_{t_1},\ldots, \tilde S_{t_N}$ converges
+to a draw from the true stochastic process $S_t$ as the mesh of the partition
+$\{t_1,\ldots,t_N\}$ tends to zero \citep{dobrow2016introduction}. We implement
+this procedure in Listing \ref{lst:sampleendprice}.
 
 In this implementation, we have two types of numerical error to reason about.
 The first is simply sampling error. Because we are only taking a finitely many
-number of draws from the distribution, our sample mean will differ from the true
-mean by a quantity that decreases with $\sqrt{n}$. Harder to reason about is the
-discretization error that we introduce. 
+number of draws from the distribution, our sample mean will differ from the
+true mean. In addition, the distribution that we sample from will not be
+precisely the distribution of $S_T$ because our partition is finite. We call the
+difference of  means of these two distributions our \emph{discretization error}.
 
 \subsection{Sampling Error}
 
-Decreases in $\sqrt{n}$. $\mathbb{QED}$
+Reasoning about sampling error is straightforward: by the Central Limit Theorem,
+if we sample possible prices $P_1, \ldots, P_N$, then the distribution of their
+sample mean will be appriximately distributed as,
+\[ \overline{P} \sim \mathcal{N}\left( \mu_P, \frac{\sigma_P}{\sqrt{N}} \right)
+\]
+for big enough $N$. In general, we can estimate $\sigma_P$ from our sample, and
+we can bring down the error because it is decreases in $\sqrt{n}$. 
+
+We can empirically confirm this by using Black-Scholes. If our local volality
+function is constant, this means that we can analytically price options. It also
+means that there is no discretization error. Thus, we can run a couple samples
+of size $10^5$ from the price distribution, price call options with each sample,
+and compare to the Black-Scholes theoretical price and standard error. The
+results of this are plotted in Figure \ref{fig:mcsamplingerror}.
+
+
+\begin{figure}[h]
+\centering
+\includegraphics{figs/mcsamplingerror}
+\caption{Monte Carlo sampling error $n=10^5$}
+\label{fig:mcsamplingerror}
+\end{figure}
+
+The figure shows us that $10^5$ samples are enough to get a pricing error of a
+couple cents, and by consequence, that $10^6$ samples are enough to get pricing
+error on the order of a cent. Moreover, pricing errors are smaller for far out
+of the money calls, which makes sense because the distribution of payoffs will
+be dominated by a point-mass at 0 (most far out of the money calls expire out of
+the money).
 
 \subsection{Discretization Error (Theory)}
-In Monte Carlo pricing, we draw from the distribution of $S_T$ and compute option prices. We start with the stochastic difference equation\footnote{We assume interest rates are zero, and so there is no drift term for simplicity} \[
-dS_t = S_t \sigma(S_t,t) \, dW_t,
-\]
-and approximate with finite differences 
-\begin{equation}
-    \label{eq:euler-maruyama}
-    \tilde S_{t_{k+1}} - \tilde S_{t_k} = \tilde S_{t_k} \sigma(\tilde S_{t_k}, t_k)\, (W_{t_{k+1}} - W_{t_k}) = \tilde S_{t_k} \sigma(\tilde S_{t_k}, t_k) \sqrt{t_{k+1}-t_k} Z_k,
-\end{equation}
-for some $Z_k = \frac{W_{t_{k+1}} - W_{t_k}}{\sqrt{t_{k+1}-t_k}} \sim \Norm(0,1)$. This is the well-known \emph{Euler-Maruyama method}, an extension of the forward Euler method in stochastic calculus. It has been shown that the recursively-computed sequence $\tilde S_{t_1},\ldots, \tilde S_{t_N}$ converges to a draw from the true stochastic process $S_t$ as the mesh of the partition $\{t_1,\ldots,t_N\}$ tends to zero \citep{dobrow2016introduction}.  
 
-Moreover, we can bound the rate of convergence. Let $\Delta t = t_{k+1} - t_k$ and suppose that $S_{t_k}$ is a draw from the true distribution. Let $S_{t_{k+1}}$ be drawn from the true distribution conditional on $S_{t_k}$, and let $\tilde S_{t_{k+1}}$ be the corresponding finite difference approximation via \eqref{eq:euler-maruyama} with respect to the same draw from the Brownian motion $W_t$. We have the following bounds on convergence \citep{higham2001algorithmic}: \begin{align}
-E\abs{S_{t_{k+1}} - \tilde S_{t_{k+1}}} &\le C_1(\Delta t)^{1/2} \tag{Strong convergence} \\
-\abs{E(g(\tilde S_{t_{k+1}})) - E (g(S_{t_{k+1}}))} &\le C_2 \Delta t \tag{Weak convergence}
+Having understood the behavior of the sampling error, we still have to bound the
+discretization error. Let $\Delta t = t_{k+1} - t_k$
+and suppose that $S_{t_k}$ is a draw from the true distribution. Let
+$S_{t_{k+1}}$ be drawn from the true distribution conditional on $S_{t_k}$, and
+let $\tilde S_{t_{k+1}}$ be the corresponding finite difference approximation
+via \eqref{eq:euler-maruyama} with respect to the same draw from the Brownian
+motion $W_t$. We have the following bounds on convergence
+\citep{higham2001algorithmic}:
+
+\begin{align}
+E\abs{S_{t_{k+1}} - \tilde S_{t_{k+1}}} &\le C_1(\Delta t)^{1/2}
+\tag{Strong convergence} \\ 
+\abs{E(g(\tilde S_{t_{k+1}})) - E (g(S_{t_{k+1}}))} &\le C_2
+\Delta t \tag{Weak convergence}
 \end{align}
+
 for a $g$ that satisfies certain regularity conditions. 
-Applying an equally-spaced partition to $[0,T]$ with step-size $\Delta t$, we immediately observe that the draws from the distribution at expiry must obey the same bounds of convergence: \begin{align*}
+Applying an equally-spaced partition to $[0,T]$ with step-size $\Delta t$, we
+immediately observe that the draws from the distribution at expiry must obey the
+same bounds of convergence:
+
+\begin{align*}
 E\abs{S_{T} - \tilde S_{T}} &= O\pr{(\Delta t)^{1/2}} \\
 \abs{E(g(\tilde S_{{T}})) - E (g(S_{T}))} &= O(\Delta t).
 \end{align*}
-Since we apply Euler-Murayama method to option pricing, we are more interested in the error $\abs{E(g(\tilde S_T)) - E(g(S_T))},$ where $g$ is a function of the form $g(S_T) = \max(S_T - K, 0)$ (for call options). The nondifferentiability of $g$ may pose some concern, as \cite{higham2001algorithmic} notes that the weak convergence bound works for $g$ smooth. However, since there exists a sequence of smooth functions $\tilde g$ that uniformly converges to $g(S_T) = \max(S_T - K, 0)$, we have \[
-\abs{E(g(\tilde S_T)) - E(g(S_T))} \le 2\norm{g-\tilde g}_\infty + \abs{E(\tilde g(\tilde S_{{T}})) - E (\tilde g(S_{T}))},
+
+Since we apply Euler-Murayama method to option pricing, we are more interested
+in the error $\abs{E(g(\tilde S_T)) - E(g(S_T))},$ where $g$ is a function of
+the form $g(S_T) = \max(S_T - K, 0)$ (for call options). The
+nondifferentiability of $g$ may pose some concern, as
+\cite{higham2001algorithmic} notes that the weak convergence bound works for $g$
+smooth. However, since there exists a sequence of smooth functions $\tilde g$
+that uniformly converges to $g(S_T) = \max(S_T - K, 0)$, we have 
+
+\[
+\abs{E(g(\tilde S_T)) - E(g(S_T))} \le 2\norm{g-\tilde g}_\infty + \abs{E(\tilde
+g(\tilde S_{{T}})) - E (\tilde g(S_{T}))},
 \]
+
 where $\norm{g-\tilde g}_\infty$ can be arbitrarily small. 
 
+\subsection{Discretization Error (Numerical Convergence)}
 
-\subsection{Discretization Error (Numerical Experiment)}
+Let $S_0 = 1, K = 1.1$, and \[\sigma(S, t) = \min\pr{0.1 + (S - 1)^2, 0.5}.\]
+Consider a call option at expiry $T = 1$ with strike $K$, whose payoff is
+$\max(S_T, K) - K$. Assume zero interest rate. We approximate the expectation
+with sample mean with sample size $10^6$. We approximate the true value of the
+option by computing the Euler-Murayama approximation with step-size equalling
+$1/200$. We then plot the pricing errors of Euler-Murayama approximations with
+step size $1/n$ for $n=1,\ldots,40$ in Figure~\ref{fig:log-log}. 
 
-Let $S_0 = 1, K = 1.1$, and \[\sigma(S, t) = \min\pr{0.1 + (S - 1)^2, 0.5}.\] Consider a call option at expiry $T = 1$ with strike $K$, whose payoff is $\max(S_T, K) - K$. Assume zero interest rate. We approximate the expectation with sample mean with sample size $10^6$. We approximate the true value of the option by computing the Euler-Murayama approximation with step-size equalling $1/200$. We then plot the pricing errors of Euler-Murayama approximations with step size $1/n$ for $n=1,\ldots,40$ in Figure~\ref{fig:log-log}. 
-
+% TODO: can we get a similar figure aesthetic for this? -FR
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.5\textwidth]{figs/montecarlo_discrete.png}
     \caption{Log-log plot of pricing error against $\Delta t$}
     \label{fig:log-log}
 \end{figure}
-It is difficult to control the Monte Carlo sampling error, due to computational resource constraints, but we do observe approximately a first-order convergence pattern. 
+
+It is difficult to control the Monte Carlo sampling error, due to computational
+resource constraints, but we do observe approximately a first-order convergence
+pattern. 
   
+Thus, for a known $\sigma^2$, we can limit the size of the discretization error
+at rate $O(\Delta t)$, and the size of the sampling error at rate $O(n^{-1/2})$
+where $n$ is the sample size. The theory and the numerical experimentation
+suggests that the Monte Carlo pricing method is numerically robust. 
 
-Thus, for a known $\sigma^2$, we can limit the size of the discretization error at rate $O(\Delta t)$, and the size of the sampling error at rate $O(n^{-1/2})$ where $n$ is the sample size. The theory and the numerical experimentation suggests that the Monte Carlo pricing method is numerically robust. 
+\subsection{Discretization Error (Across Strikes)}
+
+In the previous numerical experiment, we explored the asymptotics of
+discretization error. However, this is only half the story: we are also
+interested in how our discretization error affects the pricing of options with
+different strikes. To this end, we will use an artificial local volatility
+function,
+\[ \sigma(S_t, t) = \min(\max(0.16 + 10^{-4}(S_t - 100)^2, 0), 0.3) \]
+and price one-year-dated call options with a different number of discretizations
+ranging from 1 to 25. We plot the 1-standard-error intervals minus our most
+accurate point estimate ($10^6$ samples with 100 discretizations) for each of
+these pricings in Figure \ref{fig:discretizationK}.
+
+\begin{figure}[h!]
+\centering
+\includegraphics{figs/discretizationK.pdf}
+\caption{Pricing errors for different discretizations}
+\label{fig:discretizationK}
+\end{figure}
 
 
-\subsection{Sensitivity to Local Volatility Estimation}
+\subsection{Sensitivity to Local Volatility}
 
+Thus far, we have talked about pricing errors: differences between an option
+price we calculate and the true option price under asset diffusion as specified
+by the local volatility function. In practice, though, we will not know the true
+local volatility function since we must estimate it. This means that we also
+care about the pricing \emph{sensitivy}, i.e.\ how prices change for a change in
+the local volatility function.
+
+In general, the sensitivity will be contingent both on the local volatility
+function as well as which parts of the function are changing. Since we are only
+interested in a gauge of how sensitive these quantities are, we will restrict
+ourselves to the case where the local volatility function is constant and we
+shift the entire function up. In this case, we are in a Black-Scholes world and
+this sensitivity---called Vega---has a closed form. We can plot the values of
+vega for two $\$100$-stocks with $16\%$ and $24\%$ volatility respectively in
+Figure \ref{fig:vega},
+
+\begin{figure}[h!]
+\centering
+\includegraphics{figs/vega.eps}
+\caption{Option Vega}
+\label{fig:vega}
+\end{figure}
+
+\noindent noting that $0.40$ vega means that if volatility goes up by $1\%$,
+then the price of the option goes up by $\$0.40$. 
 
 
 \section{Fitting Local Volatility}
@@ -347,22 +474,29 @@ Thus, for a known $\sigma^2$, we can limit the size of the discretization error 
 
 
 
-% \section{Theoretical analysis of numerical methods}
-% \label{sec:theory}
-% Our approach involves two separate applications of numerical techniques. First, we observe existing option prices $C(K,T)$ and compute the local volatility function via Dupire's equation \[
-% \sigma^2 = \frac{\diff{C}{T}}{\frac{1}{2}K^2\diff{^2C}{K^2}}.
-% \] 
-% Second, given an estimate of the local volatility $\sigma^2$, we numerically predict option prices. In this section, we discuss some theoretical difficulties in deriving analytical bounds on our approximations. In particular, we proceed in reverse order. We first discuss the numerical errors of Monte Carlo pricing, assuming the local volatility $\sigma^2$ is known.
+% \section{Theoretical analysis of numerical methods} \label{sec:theory} Our
+% approach involves two separate applications of numerical techniques. First, we
+% observe existing option prices $C(K,T)$ and compute the local volatility
+% function via Dupire's equation \[ \sigma^2 =
+% \frac{\diff{C}{T}}{\frac{1}{2}K^2\diff{^2C}{K^2}}.  \] Second, given an
+% estimate of the local volatility $\sigma^2$, we numerically predict option
+% prices. In this section, we discuss some theoretical difficulties in deriving
+% analytical bounds on our approximations. In particular, we proceed in reverse
+% order. We first discuss the numerical errors of Monte Carlo pricing, assuming
+% the local volatility $\sigma^2$ is known.
 
 
 \subsection{Theoretical Difficulties}
-However, computing $\sigma^2$ from observed data accurately is a much more difficult task. We illustrate the main difficulty below.
+However, computing $\sigma^2$ from observed data accurately is a much more
+difficult task. We illustrate the main difficulty below.
 
-Let $A = \diff{C}{T} + e_1$ and $B = \diff{^2C}{K^2} + e_2$ be two approximations. Then \[
-\frac{A}{\frac{1}{2}K^2 B} = \sigma^2 \frac{\diff{^2C}{K^2}}{\diff{^2C}{K^2} + e_2} + \frac{e_1}{\frac{1}{2}K^2 B}.
+Let $A = \diff{C}{T} + e_1$ and $B = \diff{^2C}{K^2} + e_2$ be two
+approximations. Then \[ \frac{A}{\frac{1}{2}K^2 B} = \sigma^2
+\frac{\diff{^2C}{K^2}}{\diff{^2C}{K^2} + e_2} + \frac{e_1}{\frac{1}{2}K^2 B}.
 \]
 Thus the absolute error \[
-\abs{\frac{A}{\frac{1}{2}K^2 B} - \sigma^2} \le \sigma^2 \abs{\frac{e_2}{\diff{^2C}{K^2}+e_2}} + \abs{\frac{e_1}{\frac{1}{2}K^2B}}.
+\abs{\frac{A}{\frac{1}{2}K^2 B} - \sigma^2} \le \sigma^2
+\abs{\frac{e_2}{\diff{^2C}{K^2}+e_2}} + \abs{\frac{e_1}{\frac{1}{2}K^2B}}.
 \]
 Since $\diff{^2C}{K^2} > 0$, it should be unsurprising that the error vanishes
 as $e_1,e_2 \to 0$. However, note that deep-in-the-money options are virtually
@@ -387,10 +521,20 @@ are accurate to $\$0.01$, and so it is as if we are working in a world where
 machine precision is nontrivially large.
 
 
-The usual centered difference approximations have \[
-|e_1|\le \frac{h_1^2}{6}\sup \abs{\diff{^3C}{T^3}} + \frac{\epsilon}{2h_1} \qquad |e_2| \le \frac{h_2^2}{12}\sup \abs{\diff{^4C}{K^4}} + \frac{2\epsilon}{h_2^2}.
+The usual centered difference approximations have
+\[
+|e_1|\le \frac{h_1^2}{6}\sup \abs{\diff{^3C}{T^3}} + \frac{\epsilon}{2h_1}
+\qquad |e_2| \le \frac{h_2^2}{12}\sup \abs{\diff{^4C}{K^4}} +
+\frac{2\epsilon}{h_2^2}.
 \]
-For values of $\diff{^2C}{K^2}$ sufficiently large, it is plausible that these approximations are sufficiently accurate. However, the approximation is certainly not accurate for values of $\diff{^2C}{K^2}$ close to zero. Yet for these values, which correspond to deep-money options, the option price is virtually known---the large errors in $\sigma^2$ for $K$ far away from $S_0$ is weighted by the extremely small probability that such errors matter. Such weighting is analytically intractable, and we mainly focus on numerical experimentation. 
+For values of $\diff{^2C}{K^2}$ sufficiently large, it is plausible that these
+approximations are sufficiently accurate. However, the approximation is
+certainly not accurate for values of $\diff{^2C}{K^2}$ close to zero. Yet for
+these values, which correspond to deep-money options, the option price is
+virtually known---the large errors in $\sigma^2$ for $K$ far away from $S_0$ is
+weighted by the extremely small probability that such errors matter. Such
+weighting is analytically intractable, and we mainly focus on numerical
+experimentation. 
  
 \subsection{Proposed Methods}
 
