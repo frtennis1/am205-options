@@ -543,8 +543,42 @@ experimentation.
 \section{Numerical Experiment}
 
 \subsection{Methods}
+We conduct numerical experiments with local volatility functions in the following analytic forms, which are plotted in Figure~\ref{fig:local_vols}: \begin{align*}
+\sigma_1(S,t) &= \min(.16 + 10^{-4}(S-100)^2, .5) \tag{Quadratic}\\
+\sigma_2(S,t) &= 0.2\cos^2(0.1(S-100)) + 0.16 \tag{Sinusoidal}\\
+\sigma_3(S,t) &= 0.24 + \frac{0.1}{1+\exp(0.2(S-100))} \tag{Logistic} \\
+\sigma_4(S,t) &= \text{clip}(0.16 + 300^{-1}(S - 100),0,1) \tag{Linear}
+\end{align*}
+For simplicity, we assume none of these are dependent on $t$. For each local volatility function, we simulated the movement of the underlying for one year with 100 intervals per year, and calculated simulated \emph{true} option prices for each month, with \$1 apart strike prices based on $10^5$ samples. To further reduce Monte Carlo error in the true prices, we average them over 100 trials of the above procedure.
+ 
+\begin{figure}[h]
+  \centering
+  \includegraphics{figs/local_vols.eps}
+  \caption{Local Volatility Functions Considered in Numerical Experiments}
+  \label{fig:local_vols}
+\end{figure}
+
+Then, we apply the methods discussed in Section~\ref{sec:localvolfitting} to each observed true prices. Since the true prices form a grid, we obtain a grid of estimated local volatility. We construct a function $\tilde\sigma$ over all values of $S,t$ from its observed values on a grid by taking the nearest neighbor, i.e., the $\tilde \sigma$-image of a point $S,t$ not in the grid is the closest observed local volatility estimate. This is implemented via the library function \texttt{NearestNDInterpolator} in \texttt{scipy.interpolate}. We then use the interpolated $\tilde \sigma$ to price options via Monte Carlo pricing, as in Section~\ref{sec:localvolpricing}. We then compare the predicted prices to the actual prices.
+
 
 \subsection{Results}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{figs/fits.eps}
+  \caption{The fitted local volatility functions; the top two rows are finite-difference fits and the bottom two rows are local quadratic regression fits; the odd rows are $t=0$ and the even rows are $t=1$ year.}
+  \label{fig:fits}
+\end{figure}
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics{figs/errors.eps}
+  \caption{Errors obtained on four local volatility functions; the top row is errors using finite difference and the bottom row is errors using local quadratic regressions}
+  \label{fig:errors}
+\end{figure}
+
+
 
 
 \section{Discussion and Conclusion}
