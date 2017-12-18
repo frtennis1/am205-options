@@ -513,6 +513,16 @@ then we will get point estimates for all points on the inside of the grid.
 \label{fig:localvolgrid}
 \end{figure}
 
+Then, we can estimate the first partial derivative with respect to expiry using
+a central difference, and the second partial derivative with respect to strike
+using the second-order central finite difference. However, when pricing options,
+we do not just need the local volatility at a discrete grid of points. Thus, we
+need a way to use our grid of point estimates to get estimates at any point. To
+this end, we employ two main approaches. The first is to simply use the closest
+point-estimate (for instance, the shaded area represents the expanse of one
+point estimate), to get a piece-wise constant function. The second approach is
+to perform a bilinear interpolation on the grid.
+
 
 \subsection{Local Quadratic Regression}
 
@@ -572,8 +582,6 @@ weighting is analytically intractable, and we mainly focus on numerical
 experimentation. 
  
 % \subsection{Proposed Methods}
-
-
  
 \section{Numerical Experiment}
 \label{sec:numericalexp}
