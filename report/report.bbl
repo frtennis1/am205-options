@@ -1,5 +1,11 @@
 \begin{thebibliography}{}
 
+\bibitem[\protect\citeauthoryear{Black and Scholes}{Black and
+  Scholes}{1973}]{black1973pricing}
+Black, F. and M.~Scholes (1973).
+\newblock The pricing of options and corporate liabilities.
+\newblock {\em Journal of political economy\/}~{\em 81\/}(3), 637--654.
+
 \bibitem[\protect\citeauthoryear{Cochrane}{Cochrane}{2009}]{cochrane2009asset}
 Cochrane, J.~H. (2009).
 \newblock {\em Asset Pricing:(Revised Edition)}.
