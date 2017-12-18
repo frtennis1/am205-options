@@ -345,9 +345,9 @@ this procedure in Listing \ref{lst:sampleendprice}.
 
 In this implementation, we have two types of numerical error to reason about.
 The first is simply sampling error. Because we are only taking a finitely many
-number of draws from the distribution, our sample mean will differ from the
-true mean. In addition, the distribution that we sample from will not be
-precisely the distribution of $S_T$ because our partition is finite. We call the
+number of draws from the distribution, our sample mean will differ from the true
+mean. In addition, the distribution that we sample from will not be precisely
+the distribution of $S_T$ because our partition is finite. We call the
 difference of  means of these two distributions our \emph{discretization error}.
 
 \subsection{Sampling Error}
@@ -734,9 +734,9 @@ local volatility function increases asset dispersion and makes the
 discretization error of our pricer become more relevant. Additionally, a local
 volatility function that changes rapidly (has steep slope) makes it such that
 small errors in an asset's diffusion affect the future significanty. In this
-light, it makes sense that the linear function can be priced accurately
-(because it has the lowest average value), and that the logistic function can be
-priced accurately as well (because it changes gradually). On the other hand, the
+light, it makes sense that the linear function can be priced accurately (because
+it has the lowest average value), and that the logistic function can be priced
+accurately as well (because it changes gradually). On the other hand, the
 quadratic and sinusoidal local volatility functions appear harder to price.
 
 Regarding the finite differences approach versus local quadratic regression,
@@ -760,8 +760,34 @@ these right tail events.
 % but hard to say what that would even look like. Saying we're happy with
 % performance without a comparative benchmark feels dissatisfying...
 
-% TODO: is a future work section in order?
+\subsection{Future Work}
 
+On the back of our encouraging results, it would be interesting to apply our
+methods to market data. This would be problematic for data sources such as Yahoo
+Finance (see Figure \ref{fig:aapliv}) which manage illiquid strikes poorly (the
+jagged ends of the curve would be fit poorly by local volatility). However, with
+a clean data-source, it would be possible to fit a local volatility surface with
+in-sample prices, and attempt to predict out-of-sample prices (since there is no
+ground-truth local volatility function to compare against).
+
+Numerically, it would also be interesting to explore in depth the features of a
+local volatility function that make our fit local volatility curve and
+subsequent prices diverge the most from the truth. While we price four different
+local volatility functions in the above work, exploring more functional forms,
+as well as approaching the problem from a theory standpoint could prove
+fruitful. Furthermore, all the local volatility functions we use are
+time-independent, and while we believe these are representative (because
+volatility is local and doesn't depend on the past or future), it would also be
+interesting to consider time-dependent local volatility functions.
+
+Finally, we could explore additional methods both for fitting the local
+volatility surface as well as for pricing. While Monte Carlo pricing works well
+for our needs, it may be possible to achieve comparable accuracy in less time
+through a tree-based pricing model. Perhaps more interestingly, we may be able
+to fit the local volatility by optimizing over parameteric functional forms.
+This approach has the benefit of characterizing the behavior of the local
+volatility function in a way a-priori encoded by the functional form, which may
+beat our non-parameteric solution when the prices are particularly noisy.
 
 \bibliographystyle{chicago}
 \bibliography{am205.bib}
