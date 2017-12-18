@@ -71,8 +71,6 @@
 
 \begin{document}
 
-\onecolumn
-
 \title{A Numerical Exploration of the Local Volatility Model for Option Pricing}
 \author{Francisco Rivera\thanks{Harvard College, 
 \href{mailto:frivera@college.harvard.edu}{frivera@college.harvard.edu} 
@@ -89,16 +87,17 @@ allowed for the derivatives to become widely traded. However, the predictions of
 the model run counterfactual to empirically observed prices. In this paper, we
 consider a generalization to the Black-Scholes model, the local-volatility
 model. This generalization gives us more degrees of freedom to fit the prices we
-observe. With the additional expressiveness, however, come numerical
-complications. Black-Scholes requires fitting only a single number known as the
-\emph{implied volatility}, but the local volatility model requires fitting an
-entire multi-dimensional function. We explore these complications and arrive at
+observe, but with the additional expressiveness come numerical complications.
+Black-Scholes requires fitting only a single number known as the \emph{implied
+volatility}, but the local volatility model requires fitting an entire
+multi-dimensional function. We explore these complications and arrive at
 solutions that are assessed for numerical stability and accuracy to price
-out-of-sample options.
+options.
 \end{abstract}
 
 \tableofcontents
 
+\lstlistoflistings
 \newpage
 
 \section{Introduction}
@@ -258,6 +257,7 @@ Rearranging gives us Dupire's equation,
 We can also rewrite this assuming 0 interest rates, which we will assume going
 forward for simplicity,
 \begin{equation}
+\label{eqn:dupire}
  \sigma^2(K, T, S_0) = \frac{ \frac{\partial C}{\partial T}}
 {\frac{1}{2} K^2 \frac{\partial^2 C}{\partial K^2}}.
 \end{equation}
@@ -472,18 +472,40 @@ then the price of the option goes up by $\$0.40$.
 \section{Fitting Local Volatility}
 \label{sec:localvolfitting}
 
-
-
-% \section{Theoretical analysis of numerical methods} \label{sec:theory} Our
-% approach involves two separate applications of numerical techniques. First, we
-% observe existing option prices $C(K,T)$ and compute the local volatility
-% function via Dupire's equation \[ \sigma^2 =
+% \section{Theoretical analysis of numerical methods}
+% \label{sec:theory} 
+% 
+% Our approach involves two separate applications of numerical techniques.
+% First, we observe existing option prices $C(K,T)$ and compute the local
+% volatility function via Dupire's equation \[ \sigma^2 =
 % \frac{\diff{C}{T}}{\frac{1}{2}K^2\diff{^2C}{K^2}}.  \] Second, given an
 % estimate of the local volatility $\sigma^2$, we numerically predict option
 % prices. In this section, we discuss some theoretical difficulties in deriving
 % analytical bounds on our approximations. In particular, we proceed in reverse
 % order. We first discuss the numerical errors of Monte Carlo pricing, assuming
 % the local volatility $\sigma^2$ is known.
+
+Given a local volatility function, we have seen how we can price options. Also,
+given a continuum of call option prices, we can uniquely identify the local
+volatility function via Equation \ref{eqn:dupire}. However, we do not in
+practice get to observe a continuum of call option, since options are quoted
+only for discrete expiries and strikes. Thus, we must numerically approximate
+the local volatility function from what we observe.
+
+\subsection{Finite Differences}
+
+In order to estimate the local volatility from discrete option data, we will
+replace the derivatives in Equation \ref{eqn:dupire} with finite differences in
+order to get point estimates of the local volatility function. In particular, if
+we observe a grid of call option prices as in Figure \ref{fig:localvolgrid},
+then we will get point estimates for all points on the inside of the grid.
+
+\begin{figure}[h]
+\centering
+\includegraphics{figs/localvolgrid}
+\caption{Local vol estimates from grid of call prices}
+\label{fig:localvolgrid}
+\end{figure}
 
 
 \subsection{Theoretical Difficulties}
