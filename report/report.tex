@@ -533,7 +533,7 @@ order to get point estimates of the local volatility function. In particular, if
 we observe a grid of call option prices as in Figure \ref{fig:localvolgrid},
 then we will get point estimates for all points on the inside of the grid.
 
-\begin{figure}[h]
+\begin{figure}[h!]
 \centering
 \includegraphics{figs/localvolgrid}
 \caption{Local vol estimates from grid of call prices}
@@ -711,6 +711,57 @@ near at-the-money.
 \section{Discussion and Conclusion}
 \label{sec:conc}
 
+From our results, we can recover some stylized facts about the effectiveness and
+shortcomings of our approaches. 
+
+First of all, our numeric approximations of the local volatility function track
+most closely to the actual local volatility function near the current spot
+value. This is consistent with with both derivatives in equation
+\ref{eqn:dupire} approaching 0 for options that are far out of the money or deep
+in the money. Thus, small absolute errors in pricing these options (such as from
+Monte Carlo pricing) can become amplified. Similarly, we observe that the
+estimations of the local volatility function at times that are further away
+track more closely. This is similarly consistent with the price of a short-dated
+option approaching its intrinsic value, which is a linear function with zero
+partial derivative. Our results appear robust to the particular functional form
+chosen for the local volatility function.
+
+Second of all, we can observe that different local volatility functions lead to
+different levels of pricing error. While the exact dynamics at play are hard to
+pin down, we identify two possible heuristics for the difficulty of pricing
+options given a certain local volatility function. A large average value of the
+local volatility function increases asset dispersion and makes the
+discretization error of our pricer become more relevant. Additionally, a local
+volatility function that changes rapidly (has steep slope) makes it such that
+small errors in an asset's diffusion affect the future significanty. In this
+light, it makes sense that the linear function can be priced accurately
+(because it has the lowest average value), and that the logistic function can be
+priced accurately as well (because it changes gradually). On the other hand, the
+quadratic and sinusoidal local volatility functions appear harder to price.
+
+Regarding the finite differences approach versus local quadratic regression,
+both appear to be doing quite similarly. They provide estimated local volatility
+functions that track approximately about as well in all experimented situations,
+and their pricing errors are comparable as well.
+
+From all our prices, it appears that pricing far out-of-the money long-dated
+options given the quadratic local volatility causes the most error. While this
+phenomena is not a-priori evident, we attribute it to the way we fit the local
+volatility curve. In particular, in regions where we do not have enough data, we
+simply take the closest reliable estimate. For the logistic curve, this is not a
+problem, since that accurately describes the tail dynamic of the curve. However,
+for the quadratic curve, this causes us to tremendously underestimate the local
+volatility for high values of spot. An implication of this is that we
+perceptibly underestimate the likelihood of tail events, causing us especially
+misprice the options whose value is entirely derived from the probability of
+these right tail events.
+
+% Conclude that we're happy with how this does? Ideally, we'd have a benchmark,
+% but hard to say what that would even look like. Saying we're happy with
+% performance without a comparative benchmark feels dissatisfying...
+
+% TODO: is a future work section in order?
+
 
 \bibliographystyle{chicago}
 \bibliography{am205.bib}
@@ -733,5 +784,7 @@ near at-the-money.
 \lstinputlisting[
     caption=Price using Black-Scholes formula,
     label=lst:blackscholesprice]{scripts/blackscholesprice.py}
+
+% TODO: do we need more listings?
 
 \end{document}
