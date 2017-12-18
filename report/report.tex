@@ -71,7 +71,8 @@
 
 \begin{document}
 
-\title{A Numerical Exploration of the Local Volatility Model for Option Pricing}
+\title{A Numerical Exploration of the Local Volatility Model for Option
+Pricing\footnote{\url{https://github.com/frtennis1/am205-options}}}
 \author{Francisco Rivera\thanks{Harvard College, 
 \href{mailto:frivera@college.harvard.edu}{frivera@college.harvard.edu} 
 } \and Jiafeng Chen\thanks{Harvard College,
@@ -427,13 +428,15 @@ where $\norm{g-\tilde g}_\infty$ can be arbitrarily small.
 
 \subsection{Discretization Error (Numerical Convergence)}
 
-Let $S_0 = 1, K = 1.1$, and \[\sigma(S, t) = \min\pr{0.1 + (S - 1)^2, 0.5}.\]
-Consider a call option at expiry $T = 1$ with strike $K$, whose payoff is
-$\max(S_T, K) - K$. Assume zero interest rate. We approximate the expectation
-with sample mean with sample size $10^6$. We approximate the true value of the
-option by computing the Euler-Murayama approximation with step-size equalling
-$1/200$. We then plot the pricing errors of Euler-Murayama approximations with
-step size $1/n$ for $n=1,\ldots,40$ in Figure~\ref{fig:log-log}. 
+We perform the following numerical experiment to supplement the theoretical
+analysis above. Let $S_0 = 1, K = 1.1$, and \[\sigma(S, t) = \min\pr{0.1 + (S -
+1)^2, 0.5}.\] Consider a call option at expiry $T = 1$ with strike $K$, whose
+payoff is $\max(S_T, K) - K$. Assume zero interest rate. We approximate the
+expectation with sample mean with sample size $10^6$. We approximate the true
+value of the option by computing the Euler-Murayama approximation with step-size
+equalling $1/200$. We then plot the pricing errors of Euler-Murayama
+approximations with step size $1/n$ for $n=1,\ldots,40$ in
+Figure~\ref{fig:log-log}. 
 
 \begin{figure}[h!]
     \centering
@@ -455,14 +458,13 @@ suggests that the Monte Carlo pricing method is numerically robust.
 
 In the previous numerical experiment, we explored the asymptotics of
 discretization error. However, this is only half the story: we are also
-interested in how our discretization error affects the pricing of options with
-different strikes. To this end, we will use an artificial local volatility
-function,
-\[ \sigma(S_t, t) = \min(\max(0.16 + 10^{-4}(S_t - 100)^2, 0), 0.3) \]
-and price one-year-dated call options with a different number of discretizations
-ranging from 1 to 25. We plot the 1-standard-error intervals minus our most
-accurate point estimate ($10^6$ samples with 100 discretizations) for each of
-these pricings in Figure \ref{fig:discretizationK}.
+interested in how discretization error varies across strike. To this end, we
+will use an artificial local volatility function, \[ \sigma(S_t, t) =
+\min(\max(0.16 + 10^{-4}(S_t - 100)^2, 0), 0.3) \] and price one-year-dated call
+options with a different number of discretizations ranging from 1 to 25. We plot
+the 1-standard-error intervals minus our most accurate point estimate ($10^6$
+samples with 100 discretizations) for each of these pricings in Figure
+\ref{fig:discretizationK}.
 
 \begin{figure}[h!]
 \centering
@@ -634,22 +636,18 @@ following analytic forms, which are plotted in Figure~\ref{fig:local_vols}:
 For simplicity, we assume none of these are dependent on $t$. For each local
 volatility function, we simulated the movement of the underlying for one year
 with 100 intervals per year, and calculated simulated \emph{true} option prices
-for each month, with \$1 apart strike prices based on $10^5$ samples. To further
-reduce Monte Carlo error in the true prices, we average them over 100 trials of
-the above procedure (The $t=1$ prices for each local volatility function are
-plotted in Figure~\ref{fig:prices}.). We apply the procedures with the following
-caveat. We clip estimates of $\diff{C}{T}$ to zero if they become negative,
-since $\diff{C}{T} < 0$ violates a no-arbitrage condition. We assume estimates
-of $\diff{^2C}{K^2}$ as to be \texttt{NaN} if it is smaller than some threshold
-of tolerance. We use a tolerance of $0.01$ for the quadratic model, and $0.005$
-for other $\sigma$s. 
+for each month, with \$1 apart strike prices based on $10^7$ samples (The $t=1$
+prices for each local volatility function are plotted in
+Figure~\ref{fig:prices}.). We apply the procedures with the following caveat. We
+clip estimates of $\diff{C}{T}$ to zero if they become negative, since
+$\diff{C}{T} < 0$ violates a no-arbitrage condition. We assume estimates of
+$\diff{^2C}{K^2}$ as to be \texttt{NaN} if it is smaller than some threshold of
+tolerance. We use a tolerance of $0.01$ for the quadratic model, and $0.005$ for
+other $\sigma$s. 
  
-\begin{figure}[h]
-  \centering
-  \includegraphics{figs/local_vols.eps}
-  \caption{Local Volatility Functions Considered in Numerical Experiments}
-  \label{fig:local_vols}
-\end{figure}
+\begin{figure}[h] \centering \includegraphics{figs/local_vols.eps}
+\caption{Local Volatility Functions Considered in Numerical Experiments}
+\label{fig:local_vols} \end{figure}
 
 Then, we apply the methods discussed in Section~\ref{sec:localvolfitting} to
 each observed true prices. Since the true prices form a grid, we obtain a grid
@@ -722,8 +720,8 @@ Monte Carlo pricing) can become amplified. Similarly, we observe that the
 estimations of the local volatility function at times that are further away
 track more closely. This is similarly consistent with the price of a short-dated
 option approaching its intrinsic value, which is a linear function with zero
-partial derivative. Our results appear robust to the particular functional form
-chosen for the local volatility function.
+second partial derivative. Our results appear robust to the particular
+functional form chosen for the local volatility function.
 
 Second of all, we can observe that different local volatility functions lead to
 different levels of pricing error. While the exact dynamics at play are hard to
@@ -745,12 +743,12 @@ and their pricing errors are comparable as well.
 
 From all our prices, it appears that pricing far out-of-the money long-dated
 options given the quadratic local volatility causes the most error. While this
-phenomena is not a-priori evident, we attribute it to the way we fit the local
-volatility curve. In particular, in regions where we do not have enough data, we
-simply take the closest reliable estimate. For the logistic curve, this is not a
-problem, since that accurately describes the tail dynamic of the curve. However,
-for the quadratic curve, this causes us to tremendously underestimate the local
-volatility for high values of spot. An implication of this is that we
+phenomena is not \emph{a priori} evident, we attribute it to the way we fit the
+local volatility curve. In particular, in regions where we do not have enough
+data, we simply take the closest reliable estimate. For the logistic curve, this
+is not a problem, since that accurately describes the tail dynamic of the curve.
+However, for the quadratic curve, this causes us to tremendously underestimate
+the local volatility for high values of spot. An implication of this is that we
 perceptibly underestimate the likelihood of tail events, causing us especially
 misprice the options whose value is entirely derived from the probability of
 these right tail events.
@@ -777,7 +775,7 @@ local volatility functions in the above work, exploring more functional forms,
 as well as approaching the problem from a theory standpoint could prove
 fruitful. Furthermore, all the local volatility functions we use are
 time-independent, and while we believe these are representative (because
-volatility is local and doesn't depend on the past or future), it would also be
+volatility is local and does not depend on the past or future), it would also be
 interesting to consider time-dependent local volatility functions.
 
 Finally, we could explore additional methods both for fitting the local
@@ -786,8 +784,9 @@ for our needs, it may be possible to achieve comparable accuracy in less time
 through a tree-based pricing model. Perhaps more interestingly, we may be able
 to fit the local volatility by optimizing over parameteric functional forms.
 This approach has the benefit of characterizing the behavior of the local
-volatility function in a way a-priori encoded by the functional form, which may
-beat our non-parameteric solution when the prices are particularly noisy.
+volatility function in a way \emph{a priori} encoded by the functional form,
+which may beat our non-parameteric solution when the prices are particularly
+noisy.
 
 
 \bibliographystyle{chicago}
@@ -826,7 +825,7 @@ beat our non-parameteric solution when the prices are particularly noisy.
     
 \lstinputlisting[
     caption=Example of Using \texttt{LocalVolatilityPricer},
-    label=lst:fitter]{scripts/api_example.py}
+    label=lst:api]{scripts/api_example.py}
 
 
 
