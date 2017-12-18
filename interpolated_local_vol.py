@@ -14,7 +14,8 @@ class InterpolatedLocalVol:
             self.dates = np.array(dates)
 
         self.strikes = np.array(strikes)
-        self.f = interp.interp2d(self.strikes, self.dates, point_estimates, bounds_error=False, kind='linear')
+        self.f = interp.interp2d(self.strikes, self.dates,
+            point_estimates, bounds_error=False, kind='linear')
 
     def __call__(self, raw_dates, strikes):
         if self.uses_dates:
@@ -24,9 +25,6 @@ class InterpolatedLocalVol:
                 dates = raw_dates.toordinal()
         else:
             dates = raw_dates
-
-#         print(strikes)
-#         print(dates)
         return self.f(strikes, dates)
 
 class NNLocalVol(InterpolatedLocalVol):
@@ -39,18 +37,3 @@ class NNLocalVol(InterpolatedLocalVol):
                 np.vstack([strikes.flatten(), expiries.flatten()]).T,
                 self.point_estimates.flatten(),
                 rescale=True)
-
-    #     def new_call(self, raw_dates, strikes):
-    #         if self.uses_dates:
-    #             try:
-    #                 dates = np.array([d.toordinal() for d in raw_dates])
-    #             except:
-    #                 dates = raw_dates.toordinal()
-    #         else:
-    #             dates = raw_dates
-
-    # #         print(strikes)
-    # #         print(dates)
-    #         return self.f(strikes, dates)
-
-    #     self.__call__ = new_call
